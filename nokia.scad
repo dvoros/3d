@@ -1,12 +1,12 @@
 $fn = 20;
 
 phone_x = 52.7;
-phone_y = 120;
+phone_y = 120 - 3;
 phone_z = 9.5;
 corner_radius = 7;
 
-slack = 0.2;
-case_width = 1.4;
+slack = 0.16;
+case_width = 1;
 
 below_buttons = 5.5;
 above_buttons = 8.5;
@@ -18,11 +18,11 @@ screen_y = 59;
 cutoff_size = 5;
 
 camera_radius = 4.1;
-camera_from_top = 12.3;
+camera_from_top = 12.3 - 3;
 
 front_speaker_x = 10;
 front_speaker_y = 1.6;
-front_speaker_from_top = 4.2;
+front_speaker_from_top = 4.2 - 3;
 
 rear_speaker_x = 13.4;
 rear_speaker_y = 2.2;
