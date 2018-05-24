@@ -92,22 +92,51 @@ module rear_speaker() {
     square([rear_speaker_x, rear_speaker_y]);
 }
 
+module phone() {
+    linear_extrude(height = phone_z)
+    rounded_rect(phone_x, phone_y, corner_radius);
+}
+
+module tiling() {
+    module ring(d, w) {
+        difference() {
+            circle(d = d, center = true);
+            circle(d = d-w, center = true);
+        }
+    }
+    
+    translate([0, 0, -phone_z/2])
+    difference() {
+        phone();
+        
+        translate([0, -7, -phone_z])
+        linear_extrude(height = 100)
+        union() {
+            for (x = [-3 : 3]) {
+                for (y = [-6 : 6]) {
+                    translate([12*x, 7*x + 14*y, 0])
+                    ring(20, 2);
+                }
+            }
+        }
+    }
+}
+
+//tiling();
 difference() {
     // case
     translate([0, 0, -case_diff/2])
     linear_extrude(height = phone_z + case_diff)
     rounded_rect(phone_x + case_diff, phone_y + case_diff, corner_radius + case_diff/2);
 
-    // phone
-    linear_extrude(height = phone_z)
-    rounded_rect(phone_x, phone_y, corner_radius);
-    
+    phone();
+    tiling();
     buttons();
     screen();
     top_cutoff();
     camera();
     front_speaker();
-    rear_speaker();
+    //rear_speaker();
 }
 
 
