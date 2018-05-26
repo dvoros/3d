@@ -32,6 +32,9 @@ top_hole_x = 33;
 top_hole_z = 5; 
 top_hole_from_bottom = 3;
 
+snap_height = 3;
+snap_factor = 1.05;
+
 // ------------------------
 
 // How much bigger is the case
@@ -131,26 +134,31 @@ module full_case() {
     }
 }
 
+module snapper_male() {
+    linear_extrude(height = snap_height, scale = [1, snap_factor])
+            square([phone_x+case_diff, phone_z/2-slack], center = true);
+}
+
+module snapper_female() {
+    linear_extrude(height = snap_height, scale = [1, snap_factor])
+        square([phone_x*2, phone_z/2], center = true);
+}
+
 module snap_test() {
     h = 6;
-    sh = 3;
-    snap_factor = 1.05;
     
     difference() {
         union() {
-            cube([phone_x, phone_z, h], center = true);
+            cube([phone_x+case_diff, phone_z+case_diff, h], center = true);
 
             translate([0, 0, h/2])
-            linear_extrude(height = sh, scale = [1, snap_factor])
-            square([phone_x, phone_z/2-slack], center = true);
+            snapper_male();
         };
         
-        
         translate([0, 0, -h/2-0.01])
-        linear_extrude(height = sh, scale = [1, snap_factor])
-        square([phone_x*2, phone_z/2], center = true);
+        snapper_female();
         
-        cube([phone_x-case_diff, phone_z-case_diff, h*3], center = true);
+        cube([phone_x, phone_z, h*3], center = true);
     }
     
 }
