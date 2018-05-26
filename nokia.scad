@@ -117,12 +117,15 @@ module top_hole() {
     }
 }
 
-module full_case() {
-    difference() {
-        // case
-        translate([0, 0, -case_diff/2])
+module case() {
+    translate([0, 0, -case_diff/2])
         linear_extrude(height = phone_z + case_diff)
         rounded_rect(phone_x + case_diff, phone_y + case_diff, corner_radius + case_diff/2);
+}
+
+module full_case() {
+    difference() {
+        case();
 
         phone();
         buttons();
@@ -130,9 +133,40 @@ module full_case() {
         top_hole();
         camera();
         front_speaker();
-        //rear_speaker();
+        rear_speaker();
     }
 }
+
+
+
+module three_part_case_top() {
+    difference() {
+        full_case();
+        
+        snapper_female_mask();
+    }
+}
+
+module three_part_case_middle() {
+    difference() {
+        full_case();
+        
+        translate([0, -above_buttons, 0])
+        snapper_female_mask();
+        
+        snapper_male_mask();
+    }
+}
+
+module three_part_case_bottom() {
+    difference() {
+        full_case();
+        
+        translate([0, -above_buttons-0.01, 0])
+        snapper_male_mask();
+    }
+}
+
 
 module snapper_male() {
     linear_extrude(height = snap_height, scale = [1, snap_factor])
@@ -144,23 +178,32 @@ module snapper_female() {
         square([phone_x*2, phone_z/2], center = true);
 }
 
-module snap_test() {
-    h = 6;
-    
-    difference() {
-        union() {
-            cube([phone_x+case_diff, phone_z+case_diff, h], center = true);
-
-            translate([0, 0, h/2])
-            snapper_male();
-        };
-        
-        translate([0, 0, -h/2-0.01])
+module snapper_female_mask() {
+    union() {
+        translate([0, -phone_y/2 + buttons_height + above_buttons + snap_height/2, phone_z / 2])
+        rotate([-90, 0, 0])
+        translate([0, 0, -snap_height/2])
         snapper_female();
         
-        cube([phone_x, phone_z, h*3], center = true);
+        translate([0, -phone_y -phone_y/2 + buttons_height + above_buttons + 0.01, 0])
+        cube(size=phone_y*2, center = true);
     }
-    
 }
 
-snap_test();
+module snapper_male_mask() {
+    union() {
+        difference() {
+            translate([0, buttons_height + above_buttons])
+            cube(size = phone_y, center = true);
+            
+            translate([0, -phone_y/2 + buttons_height + above_buttons + snap_height/2, phone_z / 2])
+            rotate([-90, 0, 0])
+            translate([0, 0, -snap_height/2])
+            snapper_male();
+        }
+    }
+}
+
+//three_part_case_top();
+//three_part_case_middle();
+three_part_case_bottom();
