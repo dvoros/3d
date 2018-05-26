@@ -1,7 +1,7 @@
 $fn = 20;
 
 phone_x = 52.7;
-phone_y = 120 - 3;
+phone_y = 120;
 phone_z = 9.5;
 corner_radius = 7;
 
@@ -18,15 +18,19 @@ screen_y = 59;
 cutoff_size = 5;
 
 camera_radius = 4.1;
-camera_from_top = 12.3 - 3;
+camera_from_top = 12.3;
 
 front_speaker_x = 10;
 front_speaker_y = 1.6;
-front_speaker_from_top = 4.2 - 3;
+front_speaker_from_top = 4.2;
 
 rear_speaker_x = 13.4;
 rear_speaker_y = 2.2;
 rear_speaker_from_bottom = 20.2;
+
+top_hole_x = 33;
+top_hole_z = 5; 
+top_hole_from_bottom = 3;
 
 // ------------------------
 
@@ -97,46 +101,58 @@ module phone() {
     rounded_rect(phone_x, phone_y, corner_radius);
 }
 
-module tiling() {
-    module ring(d, w) {
-        difference() {
-            circle(d = d, center = true);
-            circle(d = d-w, center = true);
-        }
+module top_hole() {
+    translate([0, 0, top_hole_from_bottom])
+    rotate([-90, 0, 0])
+    linear_extrude(height=100)
+    hull() {
+        translate([-top_hole_x/2, 0, 0])
+        circle(d = top_hole_z);
+        
+        translate([top_hole_x/2, 0, 0])
+        circle(d = top_hole_z);
+    }
+}
+
+module full_case() {
+    difference() {
+        // case
+        translate([0, 0, -case_diff/2])
+        linear_extrude(height = phone_z + case_diff)
+        rounded_rect(phone_x + case_diff, phone_y + case_diff, corner_radius + case_diff/2);
+
+        phone();
+        buttons();
+        screen();
+        top_hole();
+        camera();
+        front_speaker();
+        //rear_speaker();
+    }
+}
+
+module snap_test() {
+    h = 6;
+    sh = 3;
+    snap_factor = 1.05;
+    
+    difference() {
+        union() {
+            cube([phone_x, phone_z, h], center = true);
+
+            translate([0, 0, h/2])
+            linear_extrude(height = sh, scale = [1, snap_factor])
+            square([phone_x, phone_z/2-slack], center = true);
+        };
+        
+        
+        translate([0, 0, -h/2-0.01])
+        linear_extrude(height = sh, scale = [1, snap_factor])
+        square([phone_x*2, phone_z/2], center = true);
+        
+        cube([phone_x-case_diff, phone_z-case_diff, h*3], center = true);
     }
     
-    translate([0, 0, -phone_z/2])
-    difference() {
-        phone();
-        
-        translate([0, -7, -phone_z])
-        linear_extrude(height = 100)
-        union() {
-            for (x = [-3 : 3]) {
-                for (y = [-6 : 6]) {
-                    translate([12*x, 7*x + 14*y, 0])
-                    ring(20, 2);
-                }
-            }
-        }
-    }
 }
 
-//tiling();
-difference() {
-    // case
-    translate([0, 0, -case_diff/2])
-    linear_extrude(height = phone_z + case_diff)
-    rounded_rect(phone_x + case_diff, phone_y + case_diff, corner_radius + case_diff/2);
-
-    phone();
-    tiling();
-    buttons();
-    screen();
-    top_cutoff();
-    camera();
-    front_speaker();
-    //rear_speaker();
-}
-
-
+snap_test();
