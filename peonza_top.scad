@@ -16,7 +16,8 @@ h23 = 31;
 
 w3 = 12.7;
 
-cylinder(d = d1, h = h1);
+linear_extrude(height = h1, scale = d2/d1)
+circle(d = d1);
 
 difference() {
     union() {
