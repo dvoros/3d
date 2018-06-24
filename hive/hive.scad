@@ -22,7 +22,7 @@ gh = 0.4;
 bug_for()
 //tile_for()
 
-bee();
+beetle();
 // ---------------------
 
 
@@ -99,4 +99,9 @@ module bee() {
     projection(cut = false)
     translate([179, -212, 0])
     import("bee.stl", convexity = 5);
+}
+module beetle() {
+    projection(cut = false)
+    translate([182.2, -137, 0])
+    import("beetle.stl", convexity = 5);
 }
