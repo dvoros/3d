@@ -20,8 +20,11 @@ gh = 0.4;
 // EDIT HERE:
 // ---------------------
 bug_for()
-ant();
+//tile_for()
+
+bee();
 // ---------------------
+
 
 
 module tile_for() {
@@ -56,11 +59,7 @@ module grid() {
     }
 }
 
-module ant() {
-    projection(cut = false)
-    translate([252, -199.5, 0])
-    import("ant.stl", convexity = 5);
-}
+
 
  module regular_polygon(order, r=1){
     angles=[ for (i = [0:order-1]) i*(360/order) ];
@@ -87,4 +86,17 @@ module hexagon(r, h) {
     linear_extrude(h)
     scale([r, r, 1])
     regular_polygon(6);
+}
+
+// Importing bugs
+
+module ant() {
+    projection(cut = false)
+    translate([252, -199.5, 0])
+    import("ant.stl", convexity = 5);
+}
+module bee() {
+    projection(cut = false)
+    translate([179, -212, 0])
+    import("bee.stl", convexity = 5);
 }
