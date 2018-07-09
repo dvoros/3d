@@ -22,7 +22,7 @@ gh = 0.4;
 bug_for()
 //tile_for()
 
-beetle();
+grasshopper();
 // ---------------------
 
 
@@ -93,15 +93,25 @@ module hexagon(r, h) {
 module ant() {
     projection(cut = false)
     translate([252, -199.5, 0])
-    import("ant.stl", convexity = 5);
+    import("lib/ant.stl", convexity = 5);
 }
 module bee() {
     projection(cut = false)
     translate([179, -212, 0])
-    import("bee.stl", convexity = 5);
+    import("lib/bee.stl", convexity = 5);
 }
 module beetle() {
     projection(cut = false)
     translate([182.2, -137, 0])
-    import("beetle.stl", convexity = 5);
+    import("lib/beetle.stl", convexity = 5);
+}
+module spider() {
+    projection(cut = false)
+    translate([205.6, -225, 0])
+    import("lib/spider.stl", convexity = 5);
+}
+module grasshopper() {
+    projection(cut = false)
+    translate([198.3, -181, 0])
+    import("lib/grasshopper.stl", convexity = 5);
 }
