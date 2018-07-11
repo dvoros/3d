@@ -112,6 +112,5 @@ module spider() {
 }
 module grasshopper() {
     projection(cut = false)
-    translate([198.3, -181, 0])
     import("lib/grasshopper.stl", convexity = 5);
 }
