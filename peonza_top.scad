@@ -16,18 +16,22 @@ h23 = 31;
 
 w3 = 12.7;
 
-linear_extrude(height = h1, scale = d2/d1)
+translate([0, 0, h1/2+2])
+linear_extrude(height = h1-2, scale = d2/d1)
+circle(d = d1);
+
+linear_extrude(height = h1/2+2)
 circle(d = d1);
 
 difference() {
     union() {
-        translate([0, 0, 8])
-        cylinder(d = d2, h = h23);
+        translate([0, 0, 8+h1/2])
+        cylinder(d = d2, h = h23-h1/2);
         
         translate([0, 0, h1 + h23])
         mirror([0, 0, 1])
         linear_extrude(height = 7, scale = d3/d2)
-        circle(d = d2);
+        circle(d = d2+1.5);
     }
     
     copy_x()
