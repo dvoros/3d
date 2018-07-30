@@ -1,7 +1,7 @@
 $fn = 20;
 
 phone_x = 52.7;
-phone_y = 120;
+phone_y = 121;
 phone_z = 9.5;
 corner_radius = 7;
 
@@ -10,7 +10,7 @@ case_width = 1;
 
 below_buttons = 5.5;
 above_buttons = 8.5;
-buttons_height = 44.5;
+buttons_height = 45.5;
 
 screen_x = 45;
 screen_y = 59;
