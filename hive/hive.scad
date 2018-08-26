@@ -17,14 +17,14 @@ bh = 2;
 gh = 0.4;
 
 // Magnet height
-mh = 14.04/8 + slack;
+mh = 14.04/8;
 // Magnet diameter
-md = 3 + slack;
+md = 3;
 
 // EDIT HERE:
 // ---------------------
-bug_for()
-//tile_for()
+//bug_for()
+tile_for()
 
 pillbug();
 // ---------------------
