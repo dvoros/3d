@@ -16,20 +16,28 @@ bh = 2;
 // Grid height
 gh = 0.4;
 
+// Magnet height
+mh = 14.04/8 + slack;
+// Magnet diameter
+md = 3 + slack;
 
 // EDIT HERE:
 // ---------------------
 bug_for()
 //tile_for()
 
-grasshopper();
+pillbug();
 // ---------------------
 
 
 
-module tile_for() {
+module tile_for(magnetic = true) {
   difference() {
-        tile();
+        if (magnetic) {
+            tile_with_magnets();
+        } else {
+            tile();
+        }
       
         translate([0, 0, th - bh - slack])
         linear_extrude(height=th)
@@ -82,6 +90,35 @@ module grid() {
     }
 }
 
+module tile_with_magnets() {
+    module magnet_socket(s = 1) {
+        r = tw/2-ww/2;
+        y = r * cos(30);
+        x = r * sin(30);
+        
+        translate([s * x * 0.5, y - mh, md/2 + slack * 2])
+        rotate([0, 90, 90])
+        union() {
+            translate([0, -md/2, 0])
+            cube(size = [4, md, mh]);
+            
+            cylinder(d=md, h=mh);
+        }
+    }
+    
+    difference() {
+        tile();
+        
+        for (i = [0:5]) {
+            rotate([0, 0, i * 60])
+            union() {
+                magnet_socket();
+                magnet_socket(-1);
+            }
+        }
+    }
+}
+
 module hexagon(r, h) {
     linear_extrude(h)
     scale([r, r, 1])
@@ -113,4 +150,10 @@ module spider() {
 module grasshopper() {
     projection(cut = false)
     import("lib/grasshopper.stl", convexity = 5);
+}
+module pillbug() {
+    projection(cut = false)
+    scale(0.75)
+    // translate([-110, -100, 0])
+    import("lib/pillbug.stl", convexity = 5);
 }
