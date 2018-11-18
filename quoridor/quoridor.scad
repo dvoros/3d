@@ -33,8 +33,8 @@ ww=dw-2*s;
 wl=2*dd-dw;
 
 //mini_board();
-
-wall();
+board();
+//wall();
 
 module wall() {
     rotate([0, -90, 0])
