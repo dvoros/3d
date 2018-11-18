@@ -44,7 +44,7 @@ pawn();
 //wall();
 
 module pawn() {
-    $fn=100;
+    $fn=40;
     translate([0, 0, th/2])
     union() {
         linear_extrude(scale=0.2, height=wh)
