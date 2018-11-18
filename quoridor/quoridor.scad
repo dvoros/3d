@@ -3,14 +3,14 @@ tw=150;
 // table height
 th=5;
 // wall height
-wh=20;
+wh=15;
 // slack
-s=0.2;
+s=0.3;
 
 
 // number of ditches
 dn=8;
-dr=0.1;
+dr=0.15;
 
 // epsilon
 e = 0.01;
