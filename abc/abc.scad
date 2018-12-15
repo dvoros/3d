@@ -7,7 +7,7 @@ mfr = 0.4; // mount_width/field_width ratio
 tfr = 0.85; // tile_width/field_width width ratio
 
 ss = 0.15;
-sb = 0.5;
+sb = 0.6;
 
 // -------------------------
 
@@ -21,7 +21,7 @@ tw = fw * tfr; // tile_width
 d = (n-1)/2 * fw;
 d2 = (n+1)/2 * fw;
     
-//%board();
+//board();
 //mini_board();
 //tile();
 //translate([fw, 0, 0])
@@ -40,7 +40,7 @@ module tile() {
 module clue() {
     translate([-d + fw, -d + fw, th/2 + bh/2])
     difference() {
-        cube([tw, tw, th], center=true);
+        cylinder(r = tw/2, h = th, center=true);
         
         translate([0, 0, -th/2 + (mh+ss)/2 - e])
         cylinder(d = md + 2*ss, h=mh+ss, center=true);
