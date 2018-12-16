@@ -6,8 +6,9 @@ th = 5; // tile_height
 mfr = 0.4; // mount_width/field_width ratio
 tfr = 0.85; // tile_width/field_width width ratio
 
-ss = 0.15;
-sb = 0.6;
+ss = 0.25;
+sb = 0.7;
+stop = 0.8;
 
 // -------------------------
 
@@ -23,8 +24,8 @@ d2 = (n+1)/2 * fw;
     
 //board();
 //mini_board();
-//tile();
 //translate([fw, 0, 0])
+//tile();
 clue();
 
 module tile() {
@@ -32,8 +33,8 @@ module tile() {
     difference() {
         cube([tw, tw, th], center=true);
         
-        translate([0, 0, -th/2 + (mh+sb)/2 - e])
-        cube([mw+sb, mw+sb, mh+sb], center=true);
+        translate([0, 0, -th/2 + (mh+stop)/2 - e])
+        cube([mw+2*sb, mw+2*sb, mh+stop], center=true);
     }
 }
 
@@ -42,8 +43,8 @@ module clue() {
     difference() {
         cylinder(r = tw/2, h = th, center=true);
         
-        translate([0, 0, -th/2 + (mh+ss)/2 - e])
-        cylinder(d = md + 2*ss, h=mh+ss, center=true);
+        translate([0, 0, -th/2 + (mh+stop)/2 - e])
+        cylinder(d = md + 2*ss, h=mh+stop, center=true);
     }
 }
 
@@ -63,7 +64,7 @@ module board() {
             
             for (i = [-1 : n]) {
                 for (j = [-1 : n]) {
-                    translate([-d + i*fw, -d + j * fw, th/2])
+                    translate([-d + i*fw, -d + j * fw, bh/2+mh/2-e])
                     if (i == -1 || i == n || j == -1 || j == n) {
                         cylinder(d = md, h=mh+e, center=true);
                     } else {
