@@ -1,9 +1,9 @@
-fw = 24.; // finger width
-rw = 29; // ring width
+fw = 20; // finger width
+rw = 25; // ring width
 rh = 5; // ring height
 th = 3; // text height
 
-slack = 0.2;
+slack = 0.1;
 
 // ------------------------------
 
@@ -11,10 +11,6 @@ rt = (rw-fw)/2; // ring thickness
 
 $fn = 40;
 e = 0.01;
-
-//csumi_snap();
-rings_snap();
-//csumi_full();
 
 
 module ring(h) {
@@ -26,20 +22,25 @@ module ring(h) {
     }
 }
 
+//snap()
+full()
+csumi(th);
 
-module csumi_full() {
+//rings_snap();
+
+module full() {
     scale(1.2)
-    csumi(th);
+    children();
     translate([-rw/2+rt/2, 0, -rw/2])
     ring(th);
     translate([rw/2-rt/2, 0, -rw/2])
     ring(th);
 }
 
-module csumi_snap() {
+module snap() {
     difference() {
         scale(1.2)
-        csumi(th);
+        children();
         translate([-rw/2+rt/2, 0, -rw/2])
         ring(th+2*slack);
         translate([rw/2-rt/2, 0, -rw/2])
