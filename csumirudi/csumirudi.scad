@@ -24,9 +24,8 @@ module ring(h) {
 
 //snap()
 full()
-csumi(th);
-
-//rings_snap();
+//csumi(th)
+rudi(th);
 
 module full() {
     scale(1.2)
