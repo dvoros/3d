@@ -5,9 +5,10 @@ bh = 2; // board_height
 th = 5; // tile_height
 mfr = 0.4; // mount_width/field_width ratio
 tfr = 0.85; // tile_width/field_width width ratio
+lh = 2; // letter height
 
 ss = 0.25;
-sb = 0.7;
+sb = 0.3;
 stop = 0.8;
 
 // -------------------------
@@ -21,31 +22,60 @@ tw = fw * tfr; // tile_width
 
 d = (n-1)/2 * fw;
 d2 = (n+1)/2 * fw;
-    
-//board();
-//mini_board();
-//translate([fw, 0, 0])
-//tile();
-clue();
 
-module tile() {
-    translate([-d + fw, -d + fw, th/2 + bh/2])
+piece = "manual experimenting";
+string = "";
+num = 1;
+
+if (piece == "clue") {
+    clue(string);
+}
+if (piece == "tile") {
+    tile(n=num);
+}
+if (piece == "board") {
+    board();
+}
+if (piece == "mini_board") {
+    mini_board();
+}
+
+////board();
+//mini_board();
+//translate([2*fw, 3*fw, 0])
+//tile(2);
+//translate([-d + fw, -d + fw, th/2 + bh/2])
+//clue(lett="1");
+
+module tile(n=1) {
+    height=th*n;
+    translate([-d + fw, -d + fw, height/2 + bh/2])
     difference() {
-        cube([tw, tw, th], center=true);
+        cube([tw, tw, height], center=true);
         
-        translate([0, 0, -th/2 + (mh+stop)/2 - e])
+        translate([0, 0, -height/2 + (mh+stop)/2 - e])
         cube([mw+2*sb, mw+2*sb, mh+stop], center=true);
     }
 }
 
-module clue() {
-    translate([-d + fw, -d + fw, th/2 + bh/2])
+module clue(lett="") {
     difference() {
         cylinder(r = tw/2, h = th, center=true);
         
         translate([0, 0, -th/2 + (mh+stop)/2 - e])
         cylinder(d = md + 2*ss, h=mh+stop, center=true);
+        
+        if (lett != "") {
+            letter(lett);
+        }
     }
+}
+
+module letter(lett) {
+    translate([0, 0, th/2-lh])
+    linear_extrude(height=lh+e)
+    offset(r = 0.2)
+    text(lett, font="DejaVu Serif:style=Bold", valign="center", halign="center");
 }
 
 module mini_board() {
