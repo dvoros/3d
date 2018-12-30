@@ -42,23 +42,44 @@ if (piece == "mini_board") {
 
 ////board();
 //mini_board();
-//translate([2*fw, 3*fw, 0])
-//tile(2);
-//translate([-d + fw, -d + fw, th/2 + bh/2])
+//tile(5);
 //clue(lett="1");
 
 module tile(n=1) {
     height=th*n;
-    translate([-d + fw, -d + fw, height/2 + bh/2])
+    // translate([0, 0, height/2])
+    translate([-tw/2,-tw/2,0])
     difference() {
-        cube([tw, tw, height], center=true);
+        cube([tw, tw, height]);
         
-        translate([0, 0, -height/2 + (mh+stop)/2 - e])
-        cube([mw+2*sb, mw+2*sb, mh+stop], center=true);
+//        translate([0, 0, -height/2 + (mh+stop)/2 - e])
+        translate([mw/2+sb, mw/2+sb, -e])
+        cube([mw+2*sb, mw+2*sb, mh+stop]);
+        
+        // Windows
+        if (n > 1) {
+            x = tw/5; // width of window
+            for (i = [0:n-2]) {
+                for (j = [0:2]) {
+                    translate([-e, x/2 + j*1.5*x, (i+1) * th + e])
+                    cube([tw+2*e, x, x]);
+                }
+                translate([x/2, -e, (i+1) * th + e])
+                cube([0.8*tw, tw+2*e, x]);
+            }
+        }
     }
+    
+    // rooftop
+    for (i = [1:2]) {
+        x = tw/pow(1.5,i);
+        translate([-x/2, -x/2, height])
+        cube([x, x, i*tw/10]);
+    } 
 }
 
 module clue(lett="") {
+    translate([0, 0, th/2])
     difference() {
         cylinder(r = tw/2, h = th, center=true);
         

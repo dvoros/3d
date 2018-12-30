@@ -9,19 +9,19 @@ function single {
 }
 
 function multi_string {
-	for i in `seq 1 4`; do
+	for i in `seq 1 $2`; do
 		$EXE -o "$OUT/$1_$i.stl" -D "piece=\"$1\"" -D "string=\"$i\"" $SCAD
 	done
 }
 
 function multi_num {
-	for i in `seq 1 4`; do
+	for i in `seq 1 $2`; do
 		$EXE -o "$OUT/$1_$i.stl" -D "piece=\"$1\"" -D "num=$i" $SCAD
 	done
 }
 
-multi_num tile
-multi_string clue
+multi_num tile 5
+multi_string clue 4
 single clue
 single board
 single mini_board
