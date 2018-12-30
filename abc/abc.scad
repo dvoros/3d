@@ -45,36 +45,54 @@ if (piece == "mini_board") {
 //tile(5);
 //clue(lett="1");
 
+module rotz() {
+    children();
+    
+    rotate([0, 0, 90])
+    children();
+}
+
 module tile(n=1) {
-    height=th*n;
-    // translate([0, 0, height/2])
-    translate([-tw/2,-tw/2,0])
-    difference() {
-        cube([tw, tw, height]);
-        
-//        translate([0, 0, -height/2 + (mh+stop)/2 - e])
-        translate([mw/2+sb, mw/2+sb, -e])
-        cube([mw+2*sb, mw+2*sb, mh+stop]);
-        
-        // Windows
+    
+    module windows() {
         if (n > 1) {
             x = tw/5; // width of window
-            for (i = [0:n-2]) {
-                for (j = [0:2]) {
-                    translate([-e, x/2 + j*1.5*x, (i+1) * th + e])
-                    cube([tw+2*e, x, x]);
+            
+            difference() {
+                union() {
+                    rotz()
+                    for (i = [0:n-2]) {
+                        for (j = [-1:1]) {
+                            translate([-e, 1.5*j*x, height/2-x-i*(th)])
+                            cube([tw+4*e, x, x], center=true);
+                        }
+                    }
                 }
-                translate([x/2, -e, (i+1) * th + e])
-                cube([0.8*tw, tw+2*e, x]);
+                cube([0.9*tw,0.9*tw,height], center=true);
             }
         }
     }
     
+    height=th*n;
+    // translate([0, 0, height/2])
+    // translate([-tw/2,-tw/2,0])
+    difference() {
+        cube([tw, tw, height], center=true);
+        
+//        translate([0, 0, -height/2 + (mh+stop)/2 - e])
+        #translate([0, 0, (mh+stop-height)/2-e])
+        cube([mw+2*sb, mw+2*sb, mh+stop], center=true);
+        
+        // Windows
+        windows();
+    }
+    
     // rooftop
     for (i = [1:2]) {
+        rh = 0.1*i*tw;
         x = tw/pow(1.5,i);
-        translate([-x/2, -x/2, height])
-        cube([x, x, i*tw/10]);
+        translate([0, 0, (height + rh)/2-e])
+        cube([x, x, rh], center=true);
     } 
 }
 
