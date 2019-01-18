@@ -20,7 +20,7 @@ function multi_num {
 	done
 }
 
-multi_num tile 5
+multi_num tile 6
 multi_string clue 4
 single clue
 single board

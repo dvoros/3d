@@ -51,7 +51,7 @@ if (piece == "mark") {
 
 //%board();
 //mini_board();
-building(4);
+//building(6);
 //clue(lett="1");
 //mark();
 
@@ -83,22 +83,59 @@ module building(n=1) {
         }
     }
     
-    // n: building number
     module rooftop() {
-        for (i = [1:2]) {
-            rh = 0.1*i*tw;
-            x = tw/pow(1.5,i);
-            translate([0, 0, (height + rh)/2-e])
-            cube([x, x, rh], center=true);
+        numbers = [
+            [
+            [0, 0, 0],
+            [0, 1, 0],
+            [0, 0, 0]
+            ],
+            [
+            [1, 0, 0],
+            [0, 0, 0],
+            [0, 0, 1]
+            ],
+            [
+            [0, 0, 1],
+            [0, 1, 0],
+            [1, 0, 0]
+            ],
+            [
+            [1, 0, 1],
+            [0, 0, 0],
+            [1, 0, 1]
+            ],
+            [
+            [1, 0, 1],
+            [0, 1, 0],
+            [1, 0, 1]
+            ],
+            [
+            [1, 0, 1],
+            [1, 0, 1],
+            [1, 0, 1]
+            ]
+        ];
+        number = numbers[n-1];
+        x = tw/4;
+        rh = 0.15*tw;
+        for (i = [0:2]) {
+            for (j = [0:2]) {
+                if (number[i][j] == 1) {
+                    translate([(i-1)*tw/3, (j-1)*tw/3, (height + rh)/2-e])
+                    cube([x, x, rh], center=true);
+                }
+            }
         }
     }
     
     translate([0, 0, height/2-e])
-//    translate([-tw/2,-tw/2,0])
     union() {
         difference() {
+            // main building
             cube([tw, tw, height], center=true);
             
+            // bottom hole for mount and mark
             h = trench_h + mh + sb + mark_h + stop;
             translate([0, 0, (mh+stop-height)/2-e])
             cube([tw - 2*trench_w, tw - 2 * trench_w, h], center=true);
