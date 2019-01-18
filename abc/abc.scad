@@ -137,7 +137,7 @@ module building(n=1) {
             
             // bottom hole for mount and mark
             h = trench_h + mh + sb + mark_h + stop;
-            translate([0, 0, (mh+stop-height)/2-e])
+            translate([0, 0, -height/2 + h/2 - e])
             cube([tw - 2*trench_w, tw - 2 * trench_w, h], center=true);
             
             // windows
