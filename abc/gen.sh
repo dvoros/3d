@@ -25,3 +25,4 @@ multi_string clue 4
 single clue
 single board
 single mini_board
+single mark

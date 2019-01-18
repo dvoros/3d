@@ -51,7 +51,7 @@ if (piece == "mark") {
 
 //%board();
 //mini_board();
-//building(5);
+building(4);
 //clue(lett="1");
 //mark();
 
@@ -64,24 +64,22 @@ module rotz() {
 
 module building(n=1) {
     level_h=th/2;
-    height=th + level_h*(n-1);
+    height=th + level_h*(n);
     
     module windows() {
-        if (n > 1) {
-            x = tw/5; // width of window
-            
-            difference() {
-                union() {
-                    rotz()
-                    for (i = [0:n-2]) {
-                        for (j = [-1:1]) {
-                            translate([-e, 1.5*j*x, height/2-x-i*(level_h)])
-                            cube([tw+4*e, x, x/2], center=true);
-                        }
+        x = tw/5; // width of window
+        
+        difference() {
+            union() {
+                rotz()
+                for (i = [0:n-1]) {
+                    for (j = [-1:1]) {
+                        translate([-e, 1.5*j*x, height/2-x-i*(level_h)])
+                        cube([tw+4*e, x, x/2], center=true);
                     }
                 }
-                cube([0.9*tw,0.9*tw,height], center=true);
             }
+            cube([0.9*tw,0.9*tw,height], center=true);
         }
     }
     
@@ -106,11 +104,11 @@ module building(n=1) {
             cube([tw - 2*trench_w, tw - 2 * trench_w, h], center=true);
             
             // windows
-            windows(n);
+            windows();
         }
         
         // rooftop
-        rooftop(n);
+        rooftop();
     }
 }
 
