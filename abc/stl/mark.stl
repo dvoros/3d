@@ -1,198 +1,86 @@
 solid OpenSCAD_Model
-  facet normal -1 0 0
-    outer loop
-      vertex -3.3 -3.3 -2.96667
-      vertex -3.3 3.3 -4.04133e-16
-      vertex -3.3 3.3 -2.96667
-    endloop
-  endfacet
-  facet normal -1 -0 0
-    outer loop
-      vertex -3.3 3.3 -4.04133e-16
-      vertex -3.3 -3.3 -2.96667
-      vertex -3.3 -3.3 4.04133e-16
-    endloop
-  endfacet
   facet normal 0 0 -1
     outer loop
-      vertex -3.3 -3.3 -2.96667
-      vertex 3.3 3.3 -2.96667
-      vertex 3.3 -3.3 -2.96667
+      vertex -3.85 -3.85 -1.5
+      vertex 3.85 3.85 -1.5
+      vertex 3.85 -3.85 -1.5
     endloop
   endfacet
   facet normal -0 0 -1
     outer loop
-      vertex 3.3 3.3 -2.96667
-      vertex -3.3 -3.3 -2.96667
-      vertex -3.3 3.3 -2.96667
-    endloop
-  endfacet
-  facet normal 1 0 0
-    outer loop
-      vertex 3.3 -3.3 4.04133e-16
-      vertex 3.3 3.3 -2.96667
-      vertex 3.3 3.3 -4.04133e-16
-    endloop
-  endfacet
-  facet normal 1 0 0
-    outer loop
-      vertex 3.3 3.3 -2.96667
-      vertex 3.3 -3.3 4.04133e-16
-      vertex 3.3 -3.3 -2.96667
-    endloop
-  endfacet
-  facet normal 0 -1 0
-    outer loop
-      vertex -3.3 -3.3 -2.96667
-      vertex 3.3 -3.3 4.04133e-16
-      vertex -3.3 -3.3 4.04133e-16
-    endloop
-  endfacet
-  facet normal 0 -1 -0
-    outer loop
-      vertex 3.3 -3.3 4.04133e-16
-      vertex -3.3 -3.3 -2.96667
-      vertex 3.3 -3.3 -2.96667
-    endloop
-  endfacet
-  facet normal -5.45455e-22 1.22465e-16 1
-    outer loop
-      vertex 3.3 3.3 -4.04133e-16
-      vertex 2.3 2.3 -2.81669e-16
-      vertex 3.3 -3.3 4.04133e-16
-    endloop
-  endfacet
-  facet normal 0 1.22464e-16 1
-    outer loop
-      vertex 3.3 3.3 -4.04133e-16
-      vertex -2.3 2.3 -2.81669e-16
-      vertex 2.3 2.3 -2.81669e-16
-    endloop
-  endfacet
-  facet normal 7.82609e-22 1.22465e-16 1
-    outer loop
-      vertex -2.3 2.3 -2.81669e-16
-      vertex -3.3 3.3 -4.04133e-16
-      vertex -2.3 -2.3 2.81669e-16
-    endloop
-  endfacet
-  facet normal -0 1.22464e-16 1
-    outer loop
-      vertex -3.3 3.3 -4.04133e-16
-      vertex -2.3 2.3 -2.81669e-16
-      vertex 3.3 3.3 -4.04133e-16
-    endloop
-  endfacet
-  facet normal 7.82609e-22 1.22465e-16 1
-    outer loop
-      vertex 2.3 -2.3 2.81669e-16
-      vertex 3.3 -3.3 4.04133e-16
-      vertex 2.3 2.3 -2.81669e-16
-    endloop
-  endfacet
-  facet normal -0 1.22464e-16 1
-    outer loop
-      vertex -2.3 -2.3 2.81669e-16
-      vertex 3.3 -3.3 4.04133e-16
-      vertex 2.3 -2.3 2.81669e-16
-    endloop
-  endfacet
-  facet normal 0 1.22464e-16 1
-    outer loop
-      vertex -2.3 -2.3 2.81669e-16
-      vertex -3.3 -3.3 4.04133e-16
-      vertex 3.3 -3.3 4.04133e-16
-    endloop
-  endfacet
-  facet normal -5.45455e-22 1.22465e-16 1
-    outer loop
-      vertex -3.3 -3.3 4.04133e-16
-      vertex -2.3 -2.3 2.81669e-16
-      vertex -3.3 3.3 -4.04133e-16
-    endloop
-  endfacet
-  facet normal 0 1 -0
-    outer loop
-      vertex 3.3 3.3 -2.96667
-      vertex -3.3 3.3 -4.04133e-16
-      vertex 3.3 3.3 -4.04133e-16
-    endloop
-  endfacet
-  facet normal 0 1 0
-    outer loop
-      vertex -3.3 3.3 -4.04133e-16
-      vertex 3.3 3.3 -2.96667
-      vertex -3.3 3.3 -2.96667
-    endloop
-  endfacet
-  facet normal 1 0 0
-    outer loop
-      vertex -2.3 -2.3 2.81669e-16
-      vertex -2.3 2.3 -1.95667
-      vertex -2.3 2.3 -2.81669e-16
-    endloop
-  endfacet
-  facet normal 1 0 0
-    outer loop
-      vertex -2.3 2.3 -1.95667
-      vertex -2.3 -2.3 2.81669e-16
-      vertex -2.3 -2.3 -1.95667
+      vertex 3.85 3.85 -1.5
+      vertex -3.85 -3.85 -1.5
+      vertex -3.85 3.85 -1.5
     endloop
   endfacet
   facet normal -0 0 1
     outer loop
-      vertex -2.3 2.3 -1.95667
-      vertex 2.3 -2.3 -1.95667
-      vertex 2.3 2.3 -1.95667
+      vertex -3.85 3.85 1.5
+      vertex 3.85 -3.85 1.5
+      vertex 3.85 3.85 1.5
     endloop
   endfacet
   facet normal 0 0 1
     outer loop
-      vertex 2.3 -2.3 -1.95667
-      vertex -2.3 2.3 -1.95667
-      vertex -2.3 -2.3 -1.95667
-    endloop
-  endfacet
-  facet normal -1 0 0
-    outer loop
-      vertex 2.3 -2.3 -1.95667
-      vertex 2.3 2.3 -2.81669e-16
-      vertex 2.3 2.3 -1.95667
-    endloop
-  endfacet
-  facet normal -1 -0 0
-    outer loop
-      vertex 2.3 2.3 -2.81669e-16
-      vertex 2.3 -2.3 -1.95667
-      vertex 2.3 -2.3 2.81669e-16
+      vertex 3.85 -3.85 1.5
+      vertex -3.85 3.85 1.5
+      vertex -3.85 -3.85 1.5
     endloop
   endfacet
   facet normal 0 1 -0
     outer loop
-      vertex 2.3 -2.3 -1.95667
-      vertex -2.3 -2.3 2.81669e-16
-      vertex 2.3 -2.3 2.81669e-16
+      vertex 3.85 3.85 -1.5
+      vertex -3.85 3.85 1.5
+      vertex 3.85 3.85 1.5
     endloop
   endfacet
   facet normal 0 1 0
     outer loop
-      vertex -2.3 -2.3 2.81669e-16
-      vertex 2.3 -2.3 -1.95667
-      vertex -2.3 -2.3 -1.95667
+      vertex -3.85 3.85 1.5
+      vertex 3.85 3.85 -1.5
+      vertex -3.85 3.85 -1.5
+    endloop
+  endfacet
+  facet normal 1 -0 0
+    outer loop
+      vertex 3.85 -3.85 1.5
+      vertex 3.85 3.85 -1.5
+      vertex 3.85 3.85 1.5
+    endloop
+  endfacet
+  facet normal 1 0 0
+    outer loop
+      vertex 3.85 3.85 -1.5
+      vertex 3.85 -3.85 1.5
+      vertex 3.85 -3.85 -1.5
     endloop
   endfacet
   facet normal 0 -1 0
     outer loop
-      vertex -2.3 2.3 -1.95667
-      vertex 2.3 2.3 -2.81669e-16
-      vertex -2.3 2.3 -2.81669e-16
+      vertex -3.85 -3.85 -1.5
+      vertex 3.85 -3.85 1.5
+      vertex -3.85 -3.85 1.5
     endloop
   endfacet
   facet normal 0 -1 -0
     outer loop
-      vertex 2.3 2.3 -2.81669e-16
-      vertex -2.3 2.3 -1.95667
-      vertex 2.3 2.3 -1.95667
+      vertex 3.85 -3.85 1.5
+      vertex -3.85 -3.85 -1.5
+      vertex 3.85 -3.85 -1.5
+    endloop
+  endfacet
+  facet normal -1 0 0
+    outer loop
+      vertex -3.85 -3.85 -1.5
+      vertex -3.85 3.85 1.5
+      vertex -3.85 3.85 -1.5
+    endloop
+  endfacet
+  facet normal -1 -0 0
+    outer loop
+      vertex -3.85 3.85 1.5
+      vertex -3.85 -3.85 -1.5
+      vertex -3.85 -3.85 1.5
     endloop
   endfacet
 endsolid OpenSCAD_Model
