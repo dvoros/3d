@@ -10,7 +10,7 @@ stand_z2=19.1;
 stand_depth=5;
 
 e=0.01;
-slack=0.15;
+slack=0.8;
 $fn=100;
 
 difference() {
