@@ -15,6 +15,9 @@ ss = 0.25;
 sb = 0.3;
 stop = 0.8;
 
+magnet_h=1.7;
+magnet_d=3;
+
 // -------------------------
 
 $fn=50;
@@ -50,7 +53,7 @@ if (piece == "mark") {
 }
 
 //board();
-//mini_board();
+mini_board();
 //building(6);
 //clue(lett="1");
 
@@ -68,8 +71,10 @@ module building(n=1) {
     level_h=th/2;
     height=th + level_h*(n);
     
+    building_width=0.9*tw;
+    
     module windows() {
-        x = tw/5; // width of window
+        x = building_width/5; // width of window
         
         difference() {
             union() {
@@ -77,11 +82,11 @@ module building(n=1) {
                 for (i = [0:n-1]) {
                     for (j = [-1:1]) {
                         translate([-e, 1.5*j*x, height/2-x-i*(level_h)])
-                        cube([tw+4*e, x, x/2], center=true);
+                        cube([building_width+4*e, x, x/2], center=true);
                     }
                 }
             }
-            cube([0.9*tw,0.9*tw,height], center=true);
+            cube([0.9*building_width,0.9*building_width,height], center=true);
         }
     }
     
@@ -119,28 +124,30 @@ module building(n=1) {
             ]
         ];
         number = numbers[n-1];
-        x = tw/4;
-        rh = 0.15*tw;
+        x = building_width/4;
+        rh = 0.15*building_width;
         for (i = [0:2]) {
             for (j = [0:2]) {
                 if (number[i][j] == 1) {
-                    translate([(i-1)*tw/3, (j-1)*tw/3, (height + rh)/2-e])
+                    translate([(i-1)*building_width/3, (j-1)*building_width/3, (height + rh)/2-e])
                     cube([x, x, rh], center=true);
                 }
             }
         }
     }
     
-    translate([0, 0, height/2-e])
+    //translate([0, 0, height/2-e])
     union() {
         difference() {
             // main building
-            cube([tw, tw, height], center=true);
-            
-            // bottom hole for mount and mark
-            h = sb + mark_h + stop;
-            translate([0, 0, -height/2 + h/2 - e])
-            cube([tw - 2*trench_w, tw - 2 * trench_w, h], center=true);
+            union() {
+                // base
+                base_height=0.6*th;
+                translate([0, 0, -height/2+base_height/2-e])
+                cube([tw, tw, base_height], center=true);
+                // top
+                cube([building_width, building_width, height], center=true);
+            }
             
             // windows
             windows();
@@ -211,11 +218,6 @@ module board() {
                 offset(delta=sb)
                 projection(cut=true)
                 building(1);
-                
-                // for mounts
-                translate([-d + i*fw, -d + j * fw, bh/2-trench_h/2+e])
-//                cube([tile_mw, tile_mw, mh + e], center = true);
-                cube([tile_mw, tile_mw, trench_h], center = true);
             }
         }
         
