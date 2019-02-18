@@ -16,7 +16,7 @@ stop = 0.8;
 
 magnet_h=1.7;
 magnet_d=3+sb;
-magnet_cover_w=0.4+sb;
+magnet_cover_w=0.4+sb ;
 
 // -------------------------
 
@@ -196,27 +196,26 @@ module mini_board() {
 
 module board() {
     difference() {
-        union(){
-            // board itself
-            cube([(n+2)*fw, (n+2)*fw, bh], center=true);
-            
-            // adding mounts
-            for (i = [-1 : n]) {
-                for (j = [-1 : n]) {
-                    translate([-d + i*fw, -d + j * fw, bh/2+mh/2-e])
-                    if (i == -1 || i == n || j == -1 || j == n) {
-                        cylinder(d = md, h=mh+e, center=true);
-                    }
+        // board itself
+        cube([(n+2)*fw, (n+2)*fw, bh], center=true);
+        
+
+        // clues
+        for (i = [-1 : n]) {
+            for (j = [-1 : n]) {
+                translate([-d + i*fw, -d + j * fw, bh/2+th/2-2*trench_h])
+                if (i == -1 || i == n || j == -1 || j == n) {
+                    cylinder(d = tw+2*sb, h = th, center=true);
                 }
             }
         }
         
-        // trenches
+        // buildings 
         for (i = [0 : n-1]) {
             for (j = [0 : n-1]) {
                 translate([-d + i*fw, -d + j * fw, 0])
                 {
-                    // for buildings
+                    // 
                     translate([0, 0, bh/2-trench_h+e])
                     linear_extrude(height=trench_h)
                     offset(delta=sb)
@@ -225,7 +224,7 @@ module board() {
                     
                     // magnet inside
                     translate([0, 0, bh/2-magnet_h/2-trench_h-magnet_cover_w])
-                    #cylinder(d=magnet_d, h=magnet_h, center=true);
+                    cylinder(d=magnet_d, h=magnet_h, center=true);
                 }
             }
         }
