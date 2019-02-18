@@ -55,7 +55,7 @@ if (piece == "mark") {
 }
 
 //board();
-mini_board();
+//mini_board();
 //building(6);
 //clue(lett="1");
 
@@ -219,7 +219,7 @@ module board() {
                     translate([0, 0, bh/2-trench_h+e])
                     linear_extrude(height=trench_h)
                     offset(delta=sb)
-                    projection(cut=true)
+                    projection()
                     building(1);
                     
                     // magnet inside
