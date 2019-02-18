@@ -14,7 +14,7 @@ ss = 0.25;
 sb = 0.3;
 stop = 0.8;
 
-magnet_h=1.7;
+magnet_h=1.7+2*sb;
 magnet_d=3+sb;
 magnet_cover_w=0.4+sb ;
 
