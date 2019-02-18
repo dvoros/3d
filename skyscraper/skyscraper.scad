@@ -1,7 +1,6 @@
 n = 5;
 
 fw = 20; // field_width
-bh = 2; // board_height
 th = 5; // tile_height
 tile_mfr = 0.4;  // mount_width/field_width ratio for inner tiles
 clue_mfr = 0.4; // mount_width/field_width ratio for the clues
@@ -16,9 +15,12 @@ sb = 0.3;
 stop = 0.8;
 
 magnet_h=1.7;
-magnet_d=3;
+magnet_d=3+sb;
+magnet_cover_w=0.4+sb;
 
 // -------------------------
+
+bh = trench_h+magnet_h+2*magnet_cover_w; // board_height
 
 $fn=50;
 e = 0.01;
@@ -212,12 +214,19 @@ module board() {
         // trenches
         for (i = [0 : n-1]) {
             for (j = [0 : n-1]) {
-                // for buildings
-                translate([-d + i*fw, -d + j * fw, bh/2-trench_h+e])
-                linear_extrude(height=trench_h)
-                offset(delta=sb)
-                projection(cut=true)
-                building(1);
+                translate([-d + i*fw, -d + j * fw, 0])
+                {
+                    // for buildings
+                    translate([0, 0, bh/2-trench_h+e])
+                    linear_extrude(height=trench_h)
+                    offset(delta=sb)
+                    projection(cut=true)
+                    building(1);
+                    
+                    // magnet inside
+                    translate([0, 0, bh/2-magnet_h/2-trench_h-magnet_cover_w])
+                    #cylinder(d=magnet_d, h=magnet_h, center=true);
+                }
             }
         }
         
