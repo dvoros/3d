@@ -1,9 +1,9 @@
 size = 4;
 
-bh = 6; // board height
+bh = 5; // board height
 
-r = 20; // tile radius
-th = 5; // tile height
+r = 16; // tile radius
+th = 4; // tile height
 
 edge = 2;
 slack = 0.4;
@@ -17,7 +17,7 @@ mid = 2*size-1;
 // --------------------------
 
 board();
-tile();
+//tile();
 
 // --------------------------
 
