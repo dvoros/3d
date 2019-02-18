@@ -1,6 +1,6 @@
 #!/bin/bash
 
-SCAD="abc.scad"
+SCAD="skyscraper.scad"
 OUT="stl"
 EXE="openscad-nightly"
 
