@@ -2,7 +2,7 @@ size = 4;
 
 bh = 5; // board height
 
-r = 16; // tile radius
+r = 14; // tile radius
 th = 6; // tile height
 
 edge = 2;
