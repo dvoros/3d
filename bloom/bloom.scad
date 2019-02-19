@@ -25,7 +25,7 @@ tile();
 module tile() {
     translate([0, 0, bh])
     linear_extrude(height=th)
-    offset(delta=-edge-2*slack)
+    offset(delta=-edge-slack)
     regular_polygon(6, r);
 }
 
