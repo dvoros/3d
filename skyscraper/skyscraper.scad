@@ -54,13 +54,15 @@ if (piece == "mark") {
     mark();
 }
 
-//board();
-//mini_board();
-//building(6);
-//clue(lett="1");
+if (piece == "manual experimenting") {
+    //board();
+    //mini_board();
+    building(3);
+    //clue(lett="1");
 
-//translate([0, 0, mark_h/2+bh/2-trench_h])
-//mark();
+    //translate([0, 0, mark_h/2+bh/2-trench_h])
+    //mark();
+}
 
 module rotz() {
     children();
@@ -153,6 +155,10 @@ module building(n=1) {
             
             // windows
             windows();
+            
+            // magnet inside
+            translate([0, 0, -height/2+magnet_h/2+magnet_cover_w])
+            cylinder(d=magnet_d, h=magnet_h, center=true);
         }
         
         // rooftop
