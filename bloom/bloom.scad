@@ -16,8 +16,9 @@ mid = 2*size-1;
 
 // --------------------------
 
-board();
-//tile();
+//miniBoard();
+//board();
+tile();
 
 // --------------------------
 
@@ -26,6 +27,17 @@ module tile() {
     linear_extrude(height=th)
     offset(delta=-edge-2*slack)
     regular_polygon(6, r);
+}
+
+module miniBoard() {
+    intersection() {
+        board();
+        
+        translate([0, 0,-bh/2])
+        linear_extrude(height=2*bh)
+        offset(delta=edge-e)
+        regular_polygon(6, r);
+    }
 }
 
 module board() {
