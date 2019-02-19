@@ -3,7 +3,7 @@ size = 4;
 bh = 5; // board height
 
 r = 16; // tile radius
-th = 4; // tile height
+th = 6; // tile height
 
 edge = 2;
 slack = 0.4;
@@ -17,8 +17,8 @@ mid = 2*size-1;
 // --------------------------
 
 //miniBoard();
-board();
-//tile();
+//board();
+tile();
 
 // --------------------------
 
