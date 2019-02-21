@@ -75,7 +75,7 @@ module building(n=1) {
     level_h=th/2;
     height=th + level_h*(n);
     
-    building_width=tw-2;
+    building_width=tw-2.1;
     
     module windows() {
         x = building_width/5; // width of window
