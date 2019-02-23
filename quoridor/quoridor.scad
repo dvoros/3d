@@ -5,7 +5,7 @@ th=5;
 // wall height
 wh=15;
 // slack
-s=0.3;
+s=0.1;
 
 
 // number of ditches
@@ -21,6 +21,7 @@ e = 0.01;
 
 // width
 dw=tw*dr/dn;
+echo("ditch width", dw);
 // height
 dh=th/2;
 // distance
@@ -31,6 +32,7 @@ dd=fw/(dn+1);
 
 // width
 ww=dw-2*s;
+echo("wall width", ww);
 wl=2*dd-dw;
 
 // cell width
@@ -40,8 +42,8 @@ pw=0.8*cw;
 
 //mini_board();
 //board();
-pawn();
-//wall();
+//pawn();
+wall();
 
 module pawn() {
     $fn=40;
