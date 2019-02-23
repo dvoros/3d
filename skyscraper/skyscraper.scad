@@ -20,6 +20,7 @@ magnet_cover_w=0.4+sb ;
 
 // -------------------------
 
+level_h=th/2;  // level height (in buildings)
 bh = trench_h+magnet_h+2*magnet_cover_w; // board_height
 
 $fn=50;
@@ -57,7 +58,8 @@ if (piece == "mark") {
 if (piece == "manual experimenting") {
     //board();
     //mini_board();
-    building(3);
+//    building(4);
+    park();
     //clue(lett="1");
 
     //translate([0, 0, mark_h/2+bh/2-trench_h])
@@ -72,7 +74,6 @@ module rotz() {
 }
 
 module building(n=1) {
-    level_h=th/2;
     height=th + level_h*(n);
     
     building_width=tw-2.1;
@@ -164,6 +165,36 @@ module building(n=1) {
         // rooftop
         rooftop();
     }
+}
+
+module tree(h) {
+    linear_extrude(height=h*level_h, scale=0.4)
+    circle(d=0.75*h);
+    
+    translate([0, 0, h*level_h])
+    scale([1, 1, 1.4])
+    sphere(d=1.5*h);
+}
+
+module park() {
+    base_height=0.6*th;
+    
+    translate([0, 0, -base_height/2+e])
+    cube([tw, tw, base_height], center=true);
+    
+    tree(3.7);
+    
+    translate([-0.3*tw, 0.25*tw, 0])
+    tree(1.7);
+    
+    translate([0.25*tw, 0.2*tw, 0])
+    tree(1.9);
+    
+    translate([0.2*tw, -0.2*tw, 0])
+    tree(2.7);
+    
+    translate([-0.3*tw, -0.35*tw, 0])
+    tree(2.3);
 }
 
 module mark() {
