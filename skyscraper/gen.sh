@@ -21,7 +21,7 @@ function multi_num {
 }
 
 multi_num tile 6
-multi_string clue 4
+multi_string clue 5
 single clue
 single board
 single mini_board
