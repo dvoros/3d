@@ -55,10 +55,10 @@ if (piece == "manual experimenting") {
     //mini_board();
 //    building(4);
 //    park();
-    clue(lett="1");
+//    clue(lett="1");
 
     //translate([0, 0, mark_h/2+bh/2-trench_h])
-    //mark();
+    flag();
 }
 
 module rotz() {
@@ -160,6 +160,30 @@ module building(n=1) {
         // rooftop
         rooftop();
     }
+}
+
+module flag() {
+    base_height=0.6*th;
+    
+    difference() {
+        translate([0, 0, -base_height/2+e])
+        cube([tw, tw, base_height], center=true);
+        
+        // magnet inside
+        translate([0, 0, -base_height+magnet_h/2+magnet_cover_w])
+        cylinder(d=magnet_d, h=magnet_h, center=true);
+    }
+    
+    translate([0, 0, -sqrt(2*pow(2*level_h, 2))/2 + 5*level_h])
+    difference() {
+        rotate([90, 45, 0])
+        cube([2*level_h, 2*level_h, 2], center=true);
+            
+        translate([-50, 0, 0])
+        cube([100, 100, 100], center=true);
+    }
+    
+    cylinder(d=2, h=5*level_h);
 }
 
 module tree(h) {
