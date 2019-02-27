@@ -163,7 +163,7 @@ module building(n=1) {
 }
 
 module flag() {
-    base_height=0.6*th;
+    base_height=0.8*th;
     
     difference() {
         translate([0, 0, -base_height/2+e])
