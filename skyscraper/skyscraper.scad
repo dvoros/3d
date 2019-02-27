@@ -25,10 +25,6 @@ bh = trench_h+magnet_h+2*magnet_cover_w; // board_height
 
 $fn=50;
 e = 0.01;
-mh = th / 3; // mount_height
-clue_mw = fw * clue_mfr; // mount_width for clues
-tile_mw = fw * tile_mfr; // mount_width for tiles
-md = (clue_mw + sqrt(2)*clue_mw)/2; // mount_diameter (applies for clues only)
 tw = fw * tfr; // tile_width
 
 d = (n-1)/2 * fw;
@@ -50,10 +46,6 @@ if (piece == "board") {
 if (piece == "mini_board") {
     mini_board();
 }
-if (piece == "mark") {
-    rotate([180, 0, 0])
-    mark();
-}
 if (piece == "park") {
     park();
 }
@@ -62,8 +54,8 @@ if (piece == "manual experimenting") {
     //board();
     //mini_board();
 //    building(4);
-    park();
-    //clue(lett="1");
+//    park();
+    clue(lett="1");
 
     //translate([0, 0, mark_h/2+bh/2-trench_h])
     //mark();
@@ -206,17 +198,10 @@ module park() {
     tree(2.3);
 }
 
-module mark() {
-    cube([tile_mw-sb, tile_mw-sb, mark_h], center=true);
-}
-
 module clue(lett="") {
     translate([0, 0, th/2])
     difference() {
         cylinder(r = tw/2, h = th, center=true);
-        
-        translate([0, 0, -th/2 + (mh+stop)/2 - e])
-        cylinder(d = md + 2*ss, h=mh+stop, center=true);
         
         if (lett != "") {
             letter(lett);
