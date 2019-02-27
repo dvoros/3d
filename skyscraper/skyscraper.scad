@@ -163,6 +163,7 @@ module building(n=1) {
 }
 
 module flag() {
+    flag_w=4;
     base_height=0.8*th;
     
     difference() {
@@ -174,16 +175,17 @@ module flag() {
         cylinder(d=magnet_d, h=magnet_h, center=true);
     }
     
-    translate([0, 0, -sqrt(2*pow(2*level_h, 2))/2 + 5*level_h])
+    translate([-level_h, 0, -level_h+5*level_h+e])
+    rotate([0, -45, 0])
     difference() {
         rotate([90, 45, 0])
-        cube([2*level_h, 2*level_h, 2], center=true);
+        cube([2*level_h, 2*level_h, flag_w], center=true);
             
         translate([-50, 0, 0])
         cube([100, 100, 100], center=true);
     }
     
-    cylinder(d=2, h=5*level_h);
+    cylinder(d=flag_w, h=5*level_h);
 }
 
 module tree(h) {
