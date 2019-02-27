@@ -54,6 +54,9 @@ if (piece == "mark") {
     rotate([180, 0, 0])
     mark();
 }
+if (piece == "park") {
+    park();
+}
 
 if (piece == "manual experimenting") {
     //board();
@@ -177,10 +180,16 @@ module tree(h) {
 }
 
 module park() {
-    base_height=0.6*th;
+    base_height=0.8*th;
     
-    translate([0, 0, -base_height/2+e])
-    cube([tw, tw, base_height], center=true);
+    difference() {
+        translate([0, 0, -base_height/2+e])
+        cube([tw, tw, base_height], center=true);
+        
+        // magnet inside
+        translate([0, 0, -base_height+magnet_h/2+magnet_cover_w])
+        cylinder(d=magnet_d, h=magnet_h, center=true);
+    }
     
     tree(3.7);
     

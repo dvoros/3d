@@ -26,3 +26,4 @@ single clue
 single board
 single mini_board
 single mark
+single park
