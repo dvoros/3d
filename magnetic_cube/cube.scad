@@ -8,12 +8,12 @@ $fn=50;
 
 magnet_h=1.7+2*slack;
 magnet_d=3+slack;
-magnet_cover=0.6;
+magnet_cover=0.4;
 
-//rot5()
-//one_block();
+rot5()
+one_block();
 
-one_side_with_magnet();
+//one_side_with_magnet();
 
 module one_block() {
     translate([0, 0, -side_width/2])
