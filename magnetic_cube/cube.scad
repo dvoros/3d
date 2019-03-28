@@ -10,10 +10,10 @@ magnet_h=1.7+2*slack;
 magnet_d=3+slack;
 magnet_cover=0.2;
 
-//rot5()
-//one_block();
+rot5()
+one_block();
 
-one_side_with_magnet();
+//one_side_with_magnet();
 
 module one_block() {
     translate([0, 0, -side_width/2])
@@ -25,8 +25,8 @@ module one_block() {
         translate([0, 0, -e])
         one_side();
         
-        translate([0, 0, depth + magnet_cover])
-        cylinder(d=magnet_d, h=magnet_h);
+        translate([-magnet_d/2, -magnet_d/2, depth + magnet_cover])
+        cube([magnet_d, magnet_d, magnet_h]);
     }
 }
 
