@@ -58,7 +58,8 @@ if (piece == "manual experimenting") {
 //    clue(lett="1");
 
     //translate([0, 0, mark_h/2+bh/2-trench_h])
-    flag();
+//    flag();
+    flag2();
 }
 
 module rotz() {
@@ -159,6 +160,23 @@ module building(n=1) {
         
         // rooftop
         rooftop();
+    }
+}
+
+module flag2() {
+    difference() {
+        building(3);
+        
+        translate([0, 0, 10])
+        cube(tw, center=true);
+        translate([10, -9.5, 8])
+        cube(tw, center=true);
+        translate([7, 10, 7])
+        cube(tw, center=true);
+        translate([-10, -8.5, 5.1])
+        cube(tw, center=true);
+        translate([-6, 6, 6.5])
+        cube(tw, center=true);
     }
 }
 
