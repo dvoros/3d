@@ -1,4 +1,4 @@
-n = 5;
+n = 4;
 
 fw = 20; // field_width
 th = 5; // tile_height
@@ -28,7 +28,6 @@ e = 0.01;
 tw = fw * tfr; // tile_width
 
 d = (n-1)/2 * fw;
-d2 = (n+1)/2 * fw;
 
 piece = "manual experimenting";
 string = "";
@@ -51,21 +50,35 @@ if (piece == "park") {
 }
 
 if (piece == "manual experimenting") {
-    //board();
-    //mini_board();
+    board();
+//    mini_board();
 //    building(4);
 //    park();
 //    clue(lett="1");
 
     //translate([0, 0, mark_h/2+bh/2-trench_h])
 //    flag();
-    flag2();
+//    flag2();
 }
 
 module rotz() {
     children();
     
     rotate([0, 0, 90])
+    children();
+}
+
+module mirror_x() {
+    children();
+    
+    mirror([1, 0, 0])
+    children();
+}
+
+module mirror_y() {
+    children();
+    
+    mirror([0, 1, 0])
     children();
 }
 
@@ -305,11 +318,32 @@ module board() {
         }
         
         // cut off corners
-        for (i = [-1, 1]) {
-            for (j = [-1, 1]) {
-                translate([i*d2, j*d2, 0])
-                cube(fw+e, center = true);
-            }
+        mirror_x()
+        mirror_y()
+        translate([(n+2)/2 * fw, (n+2)/2 * fw, 0])
+        rotate([0, 0, 135])
+        rounded_cut();
+
+    }
+}
+
+// used for cutting rounded corners
+module rounded_cut() {
+    cw = 1.5 * sqrt(2) * fw + e;
+    x = (fw/2)/sqrt(2);
+    difference() {
+        union() {
+        translate([0, cw/2-x, 0])
+        cylinder(d=fw, h=2*th, center=true);
+        
+        
+        cube([cw, cw, 2*th-2*e], center = true);
         }
+        
+        translate([cw/2-x, cw/2+x, 0])
+        cylinder(d=fw, h=2*th, center=true);
+        
+        translate([-cw/2+x, cw/2+x, 0])
+        cylinder(d=fw, h=2*th, center=true);
     }
 }
