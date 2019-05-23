@@ -50,8 +50,8 @@ if (piece == "park") {
 }
 
 if (piece == "manual experimenting") {
-    board();
-//    mini_board();
+//    board();
+    mini_board();
 //    building(4);
 //    park();
 //    clue(lett="1");
