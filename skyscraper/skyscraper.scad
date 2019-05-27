@@ -53,13 +53,13 @@ if (piece == "manual experimenting") {
 //    board();
 //    mini_board();
 //    building(4);
-//    park();
+    park();
 //    clue(lett="1");
 
     //translate([0, 0, mark_h/2+bh/2-trench_h])
 //    flag();
 //    flag2();
-    flag3();
+//    flag3();
 }
 
 module rotz() {
@@ -237,13 +237,13 @@ module flag() {
     cylinder(d=flag_w, h=5*level_h);
 }
 
-module tree(h) {
+module tree(h, trunk_wr=1.1, crown_hr=1.4, crown_wr=1, crown_y=0) {
     linear_extrude(height=h*level_h, scale=0.4)
-    circle(d=0.75*h);
+    circle(d=trunk_wr*h);
     
-    translate([0, 0, h*level_h])
-    scale([1, 1, 1.4])
-    sphere(d=1.5*h);
+    translate([0, 0, h*level_h+crown_y])
+    scale([crown_wr, crown_wr, crown_hr])
+    sphere(d=1.8*h);
 }
 
 module park() {
@@ -261,16 +261,16 @@ module park() {
     tree(3.7);
     
     translate([-0.3*tw, 0.25*tw, 0])
-    tree(1.7);
+    tree(1.7, trunk_wr=1.5, crown_hr=1.2, crown_wr=1.3, crown_y=-0.8);
     
     translate([0.25*tw, 0.2*tw, 0])
-    tree(1.9);
+    tree(1.9, trunk_wr=1.7, crown_wr=1.2, crown_y=-1.2);
     
     translate([0.2*tw, -0.2*tw, 0])
     tree(2.7);
     
-    translate([-0.3*tw, -0.35*tw, 0])
-    tree(2.3);
+    translate([-0.29*tw, -0.32*tw, 0])
+    tree(2.3, crown_wr=1.2);
 }
 
 module clue(lett="") {
