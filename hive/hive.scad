@@ -24,7 +24,7 @@ md = 3;
 // EDIT HERE:
 // ---------------------
 //bug_for()
-tile_for()
+tile_for(false)
 
 pillbug();
 // ---------------------
@@ -156,4 +156,16 @@ module pillbug() {
     scale(0.75)
     // translate([-110, -100, 0])
     import("lib/pillbug.stl", convexity = 5);
+}
+module mosquito() {
+    projection(cut = false)
+    scale(1)
+    translate([-125, -105, 0])
+    import("lib/mosquito.stl", convexity = 5);
+}
+module ladybug() {
+    projection(cut = false)
+    scale(1)
+    translate([-125, -103, 0])
+    import("lib/ladybug.stl", convexity = 5);
 }
