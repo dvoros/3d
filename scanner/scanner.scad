@@ -40,27 +40,33 @@ module maxi_station() {
     $bearing_outer_d = 62;
     $bearing_h = 12;
     
-    $teeth_num = 70;
+    $tooth_num = 88;
+    $gear_h = 10;
     
     $plate_d = 60;
     
     $slip_ring_small_d = 7.8;
+    $slip_ring_large_d = 21.8;
+    $slip_ring_plate_h = 0; // TODO: is slipring plate on the inside?
     
     
     // M3 nut+bolt parameters
     // All these need at least a tight fit slack (0.2)
-    // on their diameter to embed
+    // on their diameter to make a socket
     $m3_body_d = 3.0;
     $m3_head_d = 5.8;
     $m3_head_h = 2.4;
     $m3_nut_square = 5.4;
     $m3_nut_d = 6.2;
     $m3_nut_h = 2.3;
+    $m3_body_after_nut_safety = 4; // includes nut height
     
-    // Desired distrance of nut from the midline of the bolt body
-    $m3_nut_z = 4;
+    $m4_head_h = 3;
+    
     // Bolt length
-    $m3_body_len = 16;
+    $bolt_inner_body_len = 16;
+    $bolt_outer_body_len = 20;
+    
     
     // "no slack"
     $s0 = 0;
@@ -84,15 +90,24 @@ module maxi_station() {
     $h2 = ($m3_nut_d + $s3) * 2; echo($h2=$h2);
     // rigid wall width
     $h3 = 0.8;
+    $h4 = $slip_ring_plate_h + $s5;
     
     $w1 = $bearing_inner_d - $s2;
     $w2 = $bearing_inner_d + ($bearing_outer_d - $bearing_inner_d) / 3;
     $w3 = $bearing_outer_d - ($bearing_outer_d - $bearing_inner_d) / 3;
     $w4 = $bearing_outer_d + $s2;
-    $w5 = $w4 + 2*$h2;
+    $w5_min = $w4 + 2*$h2;
+    $w5 = $tooth_num + 2;
     
+    assert($w5 >= $w5_min, "teeth number is too small to fit");
     
-    $bolt_r = $w1/2 - $h2/2;
+    // Radius of cirlce on which to place the bolts on
+    $bolt_inner_r = $w1/2 - $h2/2;
+    $bolt_outer_r = $w5/2 - $h2/2;
+    
+    // Desired distrance of nuts from the heads
+    $bolt_inner_nut_z = $bolt_inner_body_len - $m3_body_after_nut_safety;
+    $bolt_outer_nut_z = $bolt_outer_body_len - $m3_body_after_nut_safety;
     
     // Middle of bearing is positioned in the center
     // relative positions follow
@@ -107,24 +122,49 @@ module maxi_station() {
     $blue_h = ($bearing_h/2 - $s4) + $h1;
     
     // height of purple part (added up from top to bottom)
-    $purple_h = $h1 + $s5 + $h1 + ($bearing_h - $s4);
+    $purple_h = $h1 + $h4 + $h1 + ($bearing_h - $s4);
     
     children();
 }
 
+// TODO: - holes for mounting slip-ring
+//       - border around slip-ring on the bottom to make sure it
+//         is centered when attaching
 module station_purple(in_place=false) {
     in_place_z = in_place ? -($purple_h + $s4 - $bearing_h/2) : 0;
     translate([0, 0, in_place_z])
     difference() {
-        cylinder(d=$w5, h=$purple_h);
+        union() {
+            base_h= $h1 + $h4 + $h1 + ($bearing_h-$gear_h)/2;
+            cylinder(d=$w5, h=base_h);
+            
+            translate([0, 0, base_h])
+            gear(tooth_number=$tooth_num, width=$gear_h, bore=0);
+        }
         
         // smaller dia, under bearing
         translate([0, 0, $h1])
         cylinder(d=$w3, h=$purple_h);
         
         // larger dia, around bearing
-        translate([0, 0, $h1+$s5+$h1])
+        translate([0, 0, $h1+$h4+$h1])
         cylinder(d=$w4, h=$purple_h);
+        
+        // bolt cutouts
+        z_rot_copy(r=$bolt_outer_r)
+        union() {
+            // body of bolt
+            cylinder(d=$m3_body_d+$s2, h=$purple_h);
+          
+            // nut pocket
+            hexagon(
+                ($m3_nut_d+2*$s2)/2,
+                $purple_h - ($bolt_outer_nut_z - ($h1/2 + $s4))
+            );
+        }
+        
+        // slip ring
+        cylinder(d=$slip_ring_large_d, h=$purple_h);
     }
     
 }
@@ -150,13 +190,13 @@ module station_green(in_place=false) {
         }
         
         // bolt cutouts
-        z_rot_copy(r=$bolt_r)
+        z_rot_copy(r=$bolt_inner_r)
         union() {
             // body of bolt
             cylinder(d=$m3_body_d+$s2, h=$green_h);
           
             // bolt_head pocket
-            cylinder(d=$m3_head_d+2*$s2, h=$green_h+$s4-$m3_body_len/2);
+            cylinder(d=$m3_head_d+2*$s2, h=$green_h+$s4-$bolt_inner_body_len/2);
         }
         
         // slip ring
@@ -178,13 +218,13 @@ module station_blue(in_place=false) {
         }
         
         // bolt cutouts
-        z_rot_copy(r=$bolt_r)
+        z_rot_copy(r=$bolt_inner_r)
         union() {
             // body of bolt
             cylinder(d=$m3_body_d+$s2, h=$blue_h);
           
             // nut pocket
-            hexagon(($m3_nut_d+2*$s2)/2, $blue_h+$s4-$m3_nut_z);
+            hexagon(($m3_nut_d+2*$s2)/2, $blue_h+$s4-($bolt_inner_nut_z-$bolt_inner_body_len/2));
         }
         
         // slip ring
@@ -193,8 +233,13 @@ module station_blue(in_place=false) {
 }
 
 module station_bolts() {
-    z_rot_copy(r=$bolt_r)
-    m3_with_nut();
+    z_rot_copy(r=$bolt_inner_r)
+    m3_with_nut(l=$bolt_inner_body_len, nut_z=$bolt_inner_nut_z, center=true);
+    
+    
+    translate([0, 0, -$bolt_outer_body_len+$bearing_h/2+$h1/2])
+    z_rot_copy(r=$bolt_outer_r)
+    m3_with_nut(l=$bolt_outer_body_len, nut_z=$bolt_outer_nut_z, center=false);
 }
 
 module station_bearing() {
@@ -219,14 +264,14 @@ module station_inside_bearing() {
         }
         
         // bolt supports
-        z_rot_copy(r=$bolt_r)
+        z_rot_copy(r=$bolt_inner_r)
         cylinder(d=$h2, h=h);
     }
 }
 
-module m3_with_nut(l=20, center=true) {
-    l=$m3_body_len;
-    
+// l: body length
+// nut_z: distance between head and nut
+module m3_with_nut(l, nut_z, center=true) {
     c = center ? -l/2 : 0;
     
     // head
@@ -240,7 +285,7 @@ module m3_with_nut(l=20, center=true) {
     cylinder(d=$m3_body_d, h=l);
     
     // nut
-    translate([0, 0, l/2 - $m3_nut_z - $m3_nut_h + c])
+    translate([0, 0, l - nut_z - $m3_nut_h + c])
     hexagon($m3_nut_d/2, $m3_nut_h);
 }
 
@@ -449,7 +494,7 @@ module large_bearing(inner_d=40, ball_d=6.3, raceway_width=10, outer_d=60, num_b
     }
 }
 
-module gear(tooth_number=50, width=10, bore=10) {
+module gear(tooth_number=50, width=10, bore=10, optimized=false) {
     /* Herringbone_gear; uses the module "spur_gear"
     modul = Height of the Tooth Tip beyond the Pitch Circle
     tooth_number = Number of Gear Teeth
@@ -458,7 +503,7 @@ module gear(tooth_number=50, width=10, bore=10) {
     pressure_angle = Pressure Angle, Standard = 20° according to DIN 867. Should not exceed 45°.
     helix_angle = Helix Angle to the Axis of Rotation, Standard = 0° (Spur Teeth)
     optimized = Holes for Material-/Weight-Saving */
-    herringbone_gear(1, tooth_number, width, bore, pressure_angle = 20, helix_angle=30, optimized=true);
+    herringbone_gear(1, tooth_number, width, bore, pressure_angle = 20, helix_angle=30, optimized=optimized);
 }
 
 module bearing_inner() {
