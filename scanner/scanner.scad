@@ -1,14 +1,6 @@
 use <../lib/chrisspen_gears/gears.scad>;
 use <../lib/mylib.scad>;
 
-
-
-
-    
-//herringbone_gear(1, 25, 10, 0, pressure_angle = 20, helix_angle=30, optimized=false);
-
-
-
 e=0.01;
 
 //gear();
@@ -20,26 +12,37 @@ e=0.01;
 //#translate([0, 0, -20]) slip_ring();
 //pcb();
 
-cut_x()
-maxi_station() {
-    color("blue")
-    station_blue();
-    
-    color("fuchsia")
-    station_bolts();
-};
+//cut_x()
+//maxi_station() {
+//    color("blue")
+//    station_blue(in_place=true);
+//    
+//    station_green(in_place=true);
+//    
+//    color("fuchsia")
+//    station_bearing();
+//    
+//    color("fuchsia")
+//    station_bolts();
+//};
 
-//maxi_station()
-//m3_with_nut();
+maxi_station()
+station_green();
+//station_blue();
 
 module maxi_station() {
     $fn=100;
+    
     $bearing_inner_d = 40;
     $bearing_outer_d = 62;
     $bearing_h = 12;
+    
     $teeth_num = 70;
-    $gear_h = 10;
-    $plate_d = 80;
+    
+    $plate_d = 60;
+    
+    $slip_ring_small_d = 7.8;
+    
     
     // M3 nut+bolt parameters
     // All these need at least a tight fit slack (0.2)
@@ -51,8 +54,10 @@ module maxi_station() {
     $m3_nut_d = 6.2;
     $m3_nut_h = 2.3;
     
-    $m3_head_nut_dist = 10;
-    $m3_body_len = 10;
+    // Desired distrance of nut from the midline of the bolt body
+    $m3_nut_z = 4;
+    // Bolt length
+    $m3_body_len = 16;
     
     // "no slack"
     $s0 = 0;
@@ -89,8 +94,12 @@ module maxi_station() {
     // relative positions follow
     
     // height of green part (added up from top to bottom)
-    $green_h = $h1 + $s5 + $h1 + $s0 + ($bearing_h/2 - $s4);
-    // height of green part (added up from top to bottom)
+    $green_h =
+        $h1 // plate width
+        + $s5 + $h1 // space for ORANGE
+        + $s0 + ($bearing_h/2 - $s4); // within bearing
+        
+    // height of blue part (added up from top to bottom)
     $blue_h = ($bearing_h/2 - $s4) + $s0 + $h1;
     
     children();
@@ -101,45 +110,87 @@ module station_bolts() {
     m3_with_nut();
 }
 
+module station_bearing() {
+    translate([0, 0, -e])
+    difference() {
+        cylinder(d=$bearing_outer_d, h=$bearing_h, center=true);
+        
+        cylinder(d=$bearing_inner_d, h=3*$bearing_h, center=true);
+    }
+}
 
-
-module station_blue() {
-    translate([0, 0, -$blue_h-$s4])
+module station_green(in_place=false) {
+    mirror_z = in_place ? 1 : 0;
+    in_place_z = in_place ? $green_h + $s4 : 0;
+    translate([0, 0, in_place_z])
+    mirror([0, 0, mirror_z])
     difference() {
         union() {
-            // small disc inside the bearing
-            translate([0, 0, $h1])
-            station_inside_bearing();
+            // plate
+            cylinder(d=$plate_d, h=$h1);
             
-            // larger outer part
-            cylinder(d=$w2, h=$h1);
+            // middle part that makes space for ORANGE
+            translate([0, 0, $h1])
+            cylinder(d=$w2, h=$h1+$s5);
+            
+            // small disc inside the bearing
+            translate([0, 0, $h1 + $s5 + $h1])
+            station_inside_bearing();
         }
         
         // bolt cutouts
         z_rot_copy(r=$bolt_r)
-        translate([0, 0, -e])
         union() {
             // body of bolt
-            cylinder(d=$m3_body_d+$s2, h=$blue_h*2);
+            cylinder(d=$m3_body_d+$s2, h=$green_h);
           
-            // nut pocket
-            hexagon(($m3_nut_d+2*$s2)/2, $blue_h-$m3_head_nut_dist/2);
+            // bolt_head pocket
+            cylinder(d=$m3_head_d+2*$s2, h=$green_h+$s4-$m3_body_len/2);
         }
         
+        // slip ring
+        cylinder(d=$slip_ring_small_d, h=$green_h);
+    }
+}
+
+module station_blue(in_place=false) {
+    in_place_z = in_place ? -$blue_h-$s4 : 0;
+    translate([0, 0, in_place_z])
+    difference() {
+        union() {
+            // larger outer part
+            cylinder(d=$w2, h=$h1);
+            
+            // small disc inside the bearing
+            translate([0, 0, $h1])
+            station_inside_bearing();
+        }
         
+        // bolt cutouts
+        z_rot_copy(r=$bolt_r)
+        union() {
+            // body of bolt
+            cylinder(d=$m3_body_d+$s2, h=$blue_h);
+          
+            // nut pocket
+            hexagon(($m3_nut_d+2*$s2)/2, $blue_h+$s4-$m3_nut_z);
+        }
+        
+        // slip ring
+        cylinder(d=$slip_ring_small_d, h=$blue_h);
     }
 }
 
 // Part of green and blue that's inside the bearing.
 // Doesn't include holes for the bolts.
 module station_inside_bearing() {
-    h=$bearing_h/2 +$s0 - $s4;
+    h= $bearing_h/2 + $s0 - $s4;
     union() {
         // outer ring
         difference() {
             cylinder(d=$w1, h=h);
-            translate([0, 0, -e])
-            cylinder(d=$w1-2*$h3, h = 2*h);
+            translate([0, 0, -h])
+            cylinder(d=$w1-2*$h3, h = 3*h);
         }
         
         // bolt supports
@@ -148,7 +199,9 @@ module station_inside_bearing() {
     }
 }
 
-module m3_with_nut(l=20, nut_h=16, center=true) {
+module m3_with_nut(l=20, center=true) {
+    l=$m3_body_len;
+    
     c = center ? -l/2 : 0;
     
     // head
@@ -162,7 +215,7 @@ module m3_with_nut(l=20, nut_h=16, center=true) {
     cylinder(d=$m3_body_d, h=l);
     
     // nut
-    translate([0, 0, l-nut_h-$m3_nut_h+c])
+    translate([0, 0, l/2 - $m3_nut_z - $m3_nut_h + c])
     hexagon($m3_nut_d/2, $m3_nut_h);
 }
 
