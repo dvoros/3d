@@ -12,22 +12,25 @@ e=0.01;
 //#translate([0, 0, -20]) slip_ring();
 //pcb();
 
-//cut_x()
-//maxi_station() {
-//    color("blue")
-//    station_blue(in_place=true);
-//    
-//    station_green(in_place=true);
-//    
-//    color("fuchsia")
-//    station_bearing();
-//    
-//    color("fuchsia")
-//    station_bolts();
-//};
+cut_x()
+maxi_station() {
+    color("blue")
+    station_blue(in_place=true);
+    
+    color("green")
+    station_green(in_place=true);
+    
+    color("purple")
+    station_purple(in_place=true);
 
-maxi_station()
-station_green();
+    %station_bearing();
+    
+    %station_bolts();
+};
+
+//maxi_station()
+//station_purple();
+//station_green();
 //station_blue();
 
 module maxi_station() {
@@ -85,7 +88,8 @@ module maxi_station() {
     $w1 = $bearing_inner_d - $s2;
     $w2 = $bearing_inner_d + ($bearing_outer_d - $bearing_inner_d) / 3;
     $w3 = $bearing_outer_d - ($bearing_outer_d - $bearing_inner_d) / 3;
-    $w4 = $bearing_outer_d + $h2;
+    $w4 = $bearing_outer_d + $s2;
+    $w5 = $w4 + 2*$h2;
     
     
     $bolt_r = $w1/2 - $h2/2;
@@ -97,27 +101,34 @@ module maxi_station() {
     $green_h =
         $h1 // plate width
         + $s5 + $h1 // space for ORANGE
-        + $s0 + ($bearing_h/2 - $s4); // within bearing
+        + ($bearing_h/2 - $s4); // within bearing
         
     // height of blue part (added up from top to bottom)
-    $blue_h = ($bearing_h/2 - $s4) + $s0 + $h1;
+    $blue_h = ($bearing_h/2 - $s4) + $h1;
+    
+    // height of purple part (added up from top to bottom)
+    $purple_h = $h1 + $s5 + $h1 + ($bearing_h - $s4);
     
     children();
 }
 
-module station_bolts() {
-    z_rot_copy(r=$bolt_r)
-    m3_with_nut();
+module station_purple(in_place=false) {
+    in_place_z = in_place ? -($purple_h + $s4 - $bearing_h/2) : 0;
+    translate([0, 0, in_place_z])
+    difference() {
+        cylinder(d=$w5, h=$purple_h);
+        
+        // smaller dia, under bearing
+        translate([0, 0, $h1])
+        cylinder(d=$w3, h=$purple_h);
+        
+        // larger dia, around bearing
+        translate([0, 0, $h1+$s5+$h1])
+        cylinder(d=$w4, h=$purple_h);
+    }
+    
 }
 
-module station_bearing() {
-    translate([0, 0, -e])
-    difference() {
-        cylinder(d=$bearing_outer_d, h=$bearing_h, center=true);
-        
-        cylinder(d=$bearing_inner_d, h=3*$bearing_h, center=true);
-    }
-}
 
 module station_green(in_place=false) {
     mirror_z = in_place ? 1 : 0;
@@ -181,10 +192,24 @@ module station_blue(in_place=false) {
     }
 }
 
+module station_bolts() {
+    z_rot_copy(r=$bolt_r)
+    m3_with_nut();
+}
+
+module station_bearing() {
+    translate([0, 0, -e])
+    difference() {
+        cylinder(d=$bearing_outer_d, h=$bearing_h, center=true);
+        
+        cylinder(d=$bearing_inner_d, h=3*$bearing_h, center=true);
+    }
+}
+
 // Part of green and blue that's inside the bearing.
 // Doesn't include holes for the bolts.
 module station_inside_bearing() {
-    h= $bearing_h/2 + $s0 - $s4;
+    h= $bearing_h/2 - $s4;
     union() {
         // outer ring
         difference() {
