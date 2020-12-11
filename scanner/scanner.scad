@@ -2,6 +2,7 @@ use <../lib/chrisspen_gears/gears.scad>;
 use <../lib/mylib.scad>;
 
 e=0.01;
+color_orange=[255/255, 165/255, 0/255];
 
 //gear();
 //platform(75/2);
@@ -12,24 +13,28 @@ e=0.01;
 //#translate([0, 0, -20]) slip_ring();
 //pcb();
 
-cut_x()
-maxi_station() {
-    color("blue")
-    station_blue(in_place=true);
-    
-    color("green")
-    station_green(in_place=true);
-    
-    color("purple")
-    station_purple(in_place=true);
+//cut_x()
+//maxi_station() {
+//    color("blue")
+//    station_blue(in_place=true);
+//    
+//    color("green")
+//    station_green(in_place=true);
+//    
+//    color("purple")
+//    station_purple(in_place=true);
+//    
+//    color(color_orange)
+//    station_orange(true);
+//
+//    station_bearing();
+//    
+//    station_bolts();
+//};
 
-    %station_bearing();
-    
-    %station_bolts();
-};
-
-//maxi_station()
-//station_purple();
+maxi_station()
+//station_orange();
+station_purple();
 //station_green();
 //station_blue();
 
@@ -124,7 +129,29 @@ module maxi_station() {
     // height of purple part (added up from top to bottom)
     $purple_h = $h1 + $h4 + $h1 + ($bearing_h - $s4);
     
+    $orange_h = $h1;
+    
     children();
+}
+
+module station_orange(in_place=false) {
+    in_place_z = in_place ? $bearing_h/2 : 0;
+    translate([0, 0, in_place_z])
+    difference() {
+        cylinder(d=$w5, h=$h1);
+        cylinder(d=$w3, h=$orange_h);
+        
+        // bolt cutouts
+        z_rot_copy(r=$bolt_outer_r)
+        union() {
+            // body of bolt
+            cylinder(d=$m3_body_d+$s2, h=$orange_h);
+          
+            // bolt_head pocket
+            translate([0, 0, $orange_h/2])
+            cylinder(d=$m3_head_d+2*$s2, h=$orange_h);
+        }
+    }
 }
 
 // TODO: - holes for mounting slip-ring
