@@ -10,45 +10,44 @@ color_orange=[255/255, 165/255, 0/255];
 //driver_gear();
 //bearing_inner();
 //large_bearing();
-//#translate([0, 0, -20]) slip_ring();
-//pcb();
+#translate([0, 0, -20]) slip_ring();
+pcb();
 
-//cut_x()
-//maxi_station() {
-//    color("blue")
-//    station_blue(in_place=true);
-//    
-//    color("green")
-//    station_green(in_place=true);
-//    
-//    color("purple")
-//    station_purple(in_place=true);
-//    
-//    color(color_orange)
-//    station_orange(true);
-//
+cut_x()
+maxi_station() {
+    color("blue")
+    station_blue(in_place=true);
+    
+    color("green")
+    station_green(in_place=true);
+    
+    color("purple")
+    station_purple(in_place=true);
+    
+    color(color_orange)
+    station_orange(true);
+
 //    station_bearing();
-//    
-//    station_bolts();
-//};
+    
+    station_bolts();
+};
 
-maxi_station()
+//maxi_station()
 //station_orange();
-station_purple();
+//station_purple();
 //station_green();
 //station_blue();
 
 module maxi_station() {
     $fn=100;
     
-    $bearing_inner_d = 40;
-    $bearing_outer_d = 62;
+    $bearing_inner_d = 50;
+    $bearing_outer_d = 72;
     $bearing_h = 12;
     
-    $tooth_num = 88;
+    $tooth_num = 100;
     $gear_h = 10;
     
-    $plate_d = 60;
     
     $slip_ring_small_d = 7.8;
     $slip_ring_large_d = 21.8;
@@ -66,7 +65,16 @@ module maxi_station() {
     $m3_nut_h = 2.3;
     $m3_body_after_nut_safety = 4; // includes nut height
     
-    $m4_head_h = 3;
+    // M4 nut+bolt parameters
+    // All these need at least a tight fit slack (0.2)
+    // on their diameter to make a socket
+    $m4_body_d = 4.0;
+    $m4_head_d = 8.0;
+    $m4_head_h = 3.2;
+    $m4_nut_square = 6.8;
+    $m4_nut_d = 7.8;
+    $m4_nut_h = 3.0;
+    $m4_body_after_nut_safety = 6; // includes nut height
     
     // Bolt length
     $bolt_inner_body_len = 16;
@@ -103,6 +111,9 @@ module maxi_station() {
     $w4 = $bearing_outer_d + $s2;
     $w5_min = $w4 + 2*$h2;
     $w5 = $tooth_num + 2;
+    
+    
+    $plate_d = $w5;
     
     assert($w5 >= $w5_min, "teeth number is too small to fit");
     
@@ -430,7 +441,8 @@ module mini_station() {
 
 
 module pcb() {
-    cube([80, 80, 16], center=true);
+    translate([0, 0, 22])
+    cube([72, 72, 10], center=true);
 }
 
 module slip_ring() {
