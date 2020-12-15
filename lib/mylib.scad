@@ -19,6 +19,13 @@ module mirror_y() {
     children();
 }
 
+module mirror_z() {
+    children();
+    
+    mirror([0, 0, 1])
+    children();
+}
+
 module z_rot_copy(r=0, arr=[0:90:360]) {
     for(rot=arr) {
         rotate([0, 0, rot])

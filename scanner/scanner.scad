@@ -7,13 +7,13 @@ color_orange=[255/255, 165/255, 0/255];
 //gear();
 //platform(75/2);
 //motor_platform(75/2);
+//maxi_station() motor_holes();
 //driver_gear();
 //bearing_inner();
 //large_bearing();
-#translate([0, 0, -20]) slip_ring();
-pcb();
+//#translate([0, 0, -20]) slip_ring();
 
-cut_x()
+//cut_x()
 maxi_station() {
     color("blue")
     station_blue(in_place=true);
@@ -30,13 +30,22 @@ maxi_station() {
 //    station_bearing();
     
     station_bolts();
+    
+//    color("cyan") pcb(in_place=true);
 };
 
 //maxi_station()
+//m3_with_nut(l=20, nut_z=10);
+//#maxi_station()
+//m4_with_nut(l=20, nut_z=10);
+
+//maxi_station()
+//station_green();
 //station_orange();
 //station_purple();
-//station_green();
 //station_blue();
+
+//lidar();
 
 module maxi_station() {
     $fn=100;
@@ -45,8 +54,14 @@ module maxi_station() {
     $bearing_outer_d = 72;
     $bearing_h = 12;
     
-    $tooth_num = 100;
+    $base_tooth_num = 100;
+    $driver_tooth_num = 25;
     $gear_h = 10;
+    
+    $motor_d=54; // diameter of circle on plate for motor
+    $motor_h=40;
+    $motor_w=42;
+    
     
     
     $slip_ring_small_d = 7.8;
@@ -63,7 +78,7 @@ module maxi_station() {
     $m3_nut_square = 5.4;
     $m3_nut_d = 6.2;
     $m3_nut_h = 2.3;
-    $m3_body_after_nut_safety = 4; // includes nut height
+    $m3_body_after_nut_safety = $m3_nut_h + 2.0;
     
     // M4 nut+bolt parameters
     // All these need at least a tight fit slack (0.2)
@@ -74,10 +89,10 @@ module maxi_station() {
     $m4_nut_square = 6.8;
     $m4_nut_d = 7.8;
     $m4_nut_h = 3.0;
-    $m4_body_after_nut_safety = 6; // includes nut height
+    $m4_body_after_nut_safety = $m4_nut_h + 2.0;
     
     // Bolt length
-    $bolt_inner_body_len = 16;
+    $bolt_inner_body_len = 20;
     $bolt_outer_body_len = 20;
     
     
@@ -97,10 +112,12 @@ module maxi_station() {
     
     // REST IS CALCULATED, DO NOT EDIT!
     
-    // width where m3 nut is embeddable (horizontally)
-    $h1 = ($m3_nut_h + $s3) * 2; echo($h1=$h1);
-    // diameter where m3 nut is embeddable in the center (vertically)
-    $h2 = ($m3_nut_d + $s3) * 2; echo($h2=$h2);
+    // width where nut is embeddable (horizontally)
+    $h1m3 = ($m3_nut_h + $s3) * 2; echo($h1m3=$h1m3);
+    $h1m4 = ($m4_nut_h + $s3) * 2; echo($h1m4=$h1m4);
+    // diameter where nut is embeddable in the center (vertically)
+    $h2m3 = ($m3_nut_d + $s3) * 2; echo($h2m3=$h2m3);
+    $h2m4 = ($m4_nut_d + $s3) * 2; echo($h2m4=$h2m4);
     // rigid wall width
     $h3 = 0.8;
     $h4 = $slip_ring_plate_h + $s5;
@@ -109,38 +126,44 @@ module maxi_station() {
     $w2 = $bearing_inner_d + ($bearing_outer_d - $bearing_inner_d) / 3;
     $w3 = $bearing_outer_d - ($bearing_outer_d - $bearing_inner_d) / 3;
     $w4 = $bearing_outer_d + $s2;
-    $w5_min = $w4 + 2*$h2;
-    $w5 = $tooth_num + 2;
+    $w5_min = $w4 + 2*$h2m4;
+    $w5 = $base_tooth_num + 2;
     
     
     $plate_d = $w5;
+    $plate_h = $h1m3;
     
-    assert($w5 >= $w5_min, "teeth number is too small to fit");
+    // TODO: re-enable!!!
+//    assert($w5 >= $w5_min, "teeth number is too small to fit");
     
     // Radius of cirlce on which to place the bolts on
-    $bolt_inner_r = $w1/2 - $h2/2;
-    $bolt_outer_r = $w5/2 - $h2/2;
+    $bolt_inner_r = $w1/2 - $h2m3/2;
+    $bolt_outer_r = $w5/2 - $h2m4/2;
     
     // Desired distrance of nuts from the heads
     $bolt_inner_nut_z = $bolt_inner_body_len - $m3_body_after_nut_safety;
-    $bolt_outer_nut_z = $bolt_outer_body_len - $m3_body_after_nut_safety;
+    $bolt_outer_nut_z = $bolt_outer_body_len - $m4_body_after_nut_safety;
     
     // Middle of bearing is positioned in the center
     // relative positions follow
     
+    $orange_h = $h1m4;
+    
     // height of green part (added up from top to bottom)
     $green_h =
-        $h1 // plate width
-        + $s5 + $h1 // space for ORANGE
+        $plate_h // plate height
+        + $s5 + $orange_h // space for ORANGE
         + ($bearing_h/2 - $s4); // within bearing
+    $plate_z = $green_h + $s4;
         
     // height of blue part (added up from top to bottom)
-    $blue_h = ($bearing_h/2 - $s4) + $h1;
+    $blue_h = ($bearing_h/2 - $s4) + $h1m3;
     
+    $purple_bottom_h = $h1m3/2;
     // height of purple part (added up from top to bottom)
-    $purple_h = $h1 + $h4 + $h1 + ($bearing_h - $s4);
+    $purple_h = $purple_bottom_h + $h4 + $h1m3 + ($bearing_h - $s4);
     
-    $orange_h = $h1;
+    
     
     children();
 }
@@ -149,18 +172,18 @@ module station_orange(in_place=false) {
     in_place_z = in_place ? $bearing_h/2 : 0;
     translate([0, 0, in_place_z])
     difference() {
-        cylinder(d=$w5, h=$h1);
+        cylinder(d=$w5, h=$orange_h);
         cylinder(d=$w3, h=$orange_h);
         
         // bolt cutouts
         z_rot_copy(r=$bolt_outer_r)
         union() {
             // body of bolt
-            cylinder(d=$m3_body_d+$s2, h=$orange_h);
+            cylinder(d=$m4_body_d+$s2, h=$orange_h);
           
             // bolt_head pocket
             translate([0, 0, $orange_h/2])
-            cylinder(d=$m3_head_d+2*$s2, h=$orange_h);
+            cylinder(d=$m4_head_d+2*$s2, h=$orange_h);
         }
     }
 }
@@ -173,31 +196,32 @@ module station_purple(in_place=false) {
     translate([0, 0, in_place_z])
     difference() {
         union() {
-            base_h= $h1 + $h4 + $h1 + ($bearing_h-$gear_h)/2;
+            base_h= $purple_bottom_h + $h4 + $h1m3 + ($bearing_h-$gear_h) - $s4;
+            
             cylinder(d=$w5, h=base_h);
             
             translate([0, 0, base_h])
-            gear(tooth_number=$tooth_num, width=$gear_h, bore=0);
+            gear(tooth_number=$base_tooth_num, width=$gear_h, bore=0);
         }
         
         // smaller dia, under bearing
-        translate([0, 0, $h1])
+        translate([0, 0, $purple_bottom_h])
         cylinder(d=$w3, h=$purple_h);
         
         // larger dia, around bearing
-        translate([0, 0, $h1+$h4+$h1])
+        translate([0, 0, $purple_bottom_h+$h4+$h1m3])
         cylinder(d=$w4, h=$purple_h);
         
         // bolt cutouts
         z_rot_copy(r=$bolt_outer_r)
         union() {
             // body of bolt
-            cylinder(d=$m3_body_d+$s2, h=$purple_h);
+            cylinder(d=$m4_body_d+$s2, h=2*$purple_h);
           
             // nut pocket
             hexagon(
-                ($m3_nut_d+2*$s2)/2,
-                $purple_h - ($bolt_outer_nut_z - ($h1/2 + $s4))
+                ($m4_nut_d+2*$s2)/2,
+                $purple_h - ($bolt_outer_nut_z - ($orange_h/2 + $s4))
             );
         }
         
@@ -207,35 +231,53 @@ module station_purple(in_place=false) {
     
 }
 
-
+// plate
 module station_green(in_place=false) {
     mirror_z = in_place ? 1 : 0;
-    in_place_z = in_place ? $green_h + $s4 : 0;
+    in_place_z = in_place ? $plate_z : 0;
     translate([0, 0, in_place_z])
     mirror([0, 0, mirror_z])
     difference() {
         union() {
             // plate
-            cylinder(d=$plate_d, h=$h1);
+            linear_extrude(height=$plate_h)
+            hull() {
+                // main part above base
+                circle(d=$plate_d);
+                
+                // motor holder
+                translate([($base_tooth_num+$driver_tooth_num)/2, 0, 0])
+                circle(d=$motor_d);
+            }
             
             // middle part that makes space for ORANGE
-            translate([0, 0, $h1])
-            cylinder(d=$w2, h=$h1+$s5);
+            translate([0, 0, $plate_h])
+            cylinder(d=$w2, h=$orange_h+$s5);
             
             // small disc inside the bearing
-            translate([0, 0, $h1 + $s5 + $h1])
+            translate([0, 0, $plate_h + $s5 + $orange_h])
             station_inside_bearing();
         }
         
-        // bolt cutouts
+        // middle bolt cutouts
         z_rot_copy(r=$bolt_inner_r)
         union() {
             // body of bolt
-            cylinder(d=$m3_body_d+$s2, h=$green_h);
+            cylinder(d=$m3_body_d+$s2, h=2*$green_h);
           
             // bolt_head pocket
             cylinder(d=$m3_head_d+2*$s2, h=$green_h+$s4-$bolt_inner_body_len/2);
         }
+        
+        // assembly holes for orange bolts
+        mirror_y()
+        translate([0, $bolt_outer_r, -e])
+        cylinder(d=$m4_head_d+$s2, h=2*$green_h);
+        
+        // motor bolt cutouts
+        translate([($base_tooth_num+$driver_tooth_num)/2, 0, $plate_h+e])
+        mirror([0, 0, 1])
+        motor_holes();
         
         // slip ring
         cylinder(d=$slip_ring_small_d, h=$green_h);
@@ -248,10 +290,10 @@ module station_blue(in_place=false) {
     difference() {
         union() {
             // larger outer part
-            cylinder(d=$w2, h=$h1);
+            cylinder(d=$w2, h=$h1m3);
             
             // small disc inside the bearing
-            translate([0, 0, $h1])
+            translate([0, 0, $h1m3])
             station_inside_bearing();
         }
         
@@ -271,13 +313,14 @@ module station_blue(in_place=false) {
 }
 
 module station_bolts() {
+    // inner
     z_rot_copy(r=$bolt_inner_r)
     m3_with_nut(l=$bolt_inner_body_len, nut_z=$bolt_inner_nut_z, center=true);
     
-    
-    translate([0, 0, -$bolt_outer_body_len+$bearing_h/2+$h1/2])
+    // outer
+    translate([0, 0, -$bolt_outer_body_len+$bearing_h/2+$orange_h/2])
     z_rot_copy(r=$bolt_outer_r)
-    m3_with_nut(l=$bolt_outer_body_len, nut_z=$bolt_outer_nut_z, center=false);
+    m4_with_nut(l=$bolt_outer_body_len, nut_z=$bolt_outer_nut_z, center=false);
 }
 
 module station_bearing() {
@@ -303,32 +346,57 @@ module station_inside_bearing() {
         
         // bolt supports
         z_rot_copy(r=$bolt_inner_r)
-        cylinder(d=$h2, h=h);
+        cylinder(d=$h2m3, h=h);
     }
 }
 
 // l: body length
 // nut_z: distance between head and nut
-module m3_with_nut(l, nut_z, center=true) {
+module bolt_with_nut(l, nut_z, head_d, head_h, body_d, nut_h, nut_d, center=true) {
     c = center ? -l/2 : 0;
     
     // head
     translate([0, 0, l+c])
-    scale([$m3_head_d, $m3_head_d, 2*$m3_head_h])
+    scale([head_d, head_d, 2*head_h])
     cut_z()
     sphere(d=1);
     
     // body
     translate([0, 0, c])
-    cylinder(d=$m3_body_d, h=l);
+    cylinder(d=body_d, h=l);
     
     // nut
-    translate([0, 0, l - nut_z - $m3_nut_h + c])
-    hexagon($m3_nut_d/2, $m3_nut_h);
+    translate([0, 0, l - nut_z - nut_h + c])
+    hexagon(nut_d/2, nut_h);
 }
 
-module pcb() {
-    translate([0, 0, 22])
+// l: body length
+// nut_z: distance between head and nut
+module m3_with_nut(l, nut_z, center=true) {
+    bolt_with_nut(l, nut_z, 
+        $m3_head_d,
+        $m3_head_h,
+        $m3_body_d,
+        $m3_nut_h, 
+        $m3_nut_d,
+        center);
+}
+
+// l: body length
+// nut_z: distance between head and nut
+module m4_with_nut(l, nut_z, center=true) {
+    bolt_with_nut(l, nut_z, 
+        $m4_head_d,
+        $m4_head_h,
+        $m4_body_d,
+        $m4_nut_h, 
+        $m4_nut_d,
+        center);
+}
+
+module pcb(in_place=true) {
+    in_place_z = in_place ? $plate_z : 0;
+    translate([0, 0, 5 + in_place_z])
     cube([72, 72, 10], center=true);
 }
 
@@ -340,6 +408,60 @@ module slip_ring() {
     
     translate([0, 0, 26.5 - e])
     cylinder(d=7.8, h=9.5);
+}
+
+module motor() {
+    
+}
+
+module lidar() {
+    $fn=30;
+    base_x=48;
+    base_y=20;
+    base_z=14.6;
+    
+    bolts_x=28.6;
+    bolts_y=27.7;
+    bolts_h=2.7;
+    bolts_d=3.8;
+    bolts_dd=6;
+    
+    lense_d=base_y;
+    lense_h=25.6;
+    
+    bridge_h=22;
+    bridge_y=9.7;
+    
+    // base
+    translate([0, 0, base_z/2])
+    cube([base_x, base_y, base_z], center=true);
+    
+    // bolts
+    for(i=[-1, 1]) {
+        linear_extrude(height=bolts_h)
+        difference() {
+            hull() {
+                for(j=[-1, 1]) {
+                    translate([i*bolts_x/2, j*(base_y/2 + bolts_dd/2), 0])
+                    circle(d=bolts_dd);
+                }
+            }
+            for(j=[-1, 1]) {
+                translate([i*bolts_x/2, j*(base_y/2 + bolts_dd/2), 0])
+                circle(d=bolts_d);
+            }
+        }
+    }
+    
+    // lenses
+    for(i=[-1, 1]) {
+        translate([i*(base_x/2 - lense_d/2), 0, base_z])
+        cylinder(d=lense_d, h=lense_h);
+    }
+    
+    // bridge between lenses
+    translate([0, 0, bridge_h/2 + base_z])
+    cube([base_x-lense_d, bridge_y, bridge_h], center=true);
 }
 
 
@@ -473,6 +595,25 @@ module driver_gear(tooth_number=25, nut_h = 2.5, nut_w=5.6, h=16) {
 
 module m3_side_pocket(nut_h = 2.5, nut_w=5.6, center=false) {
     cube([nut_h, nut_w, nut_w], center=center);
+}
+
+module motor_holes() {
+    $fn=30;
+    
+    mirror_x()
+    mirror_y()
+    translate([-31/2, -31/2, 0])
+    cylinder(d=$m3_head_d + 2*$s2, h=$m3_head_h + 2*$s2);
+    
+    linear_extrude(height=50) {
+        mirror_x()
+        mirror_y()
+        translate([-31/2, -31/2, 0])
+        circle(d=3.4);
+        
+        circle(d=24);
+    }
+    
 }
 
 module motor_platform(dist, h=6, bolt_head_d = 5.7, nut_h = 2.5) {
