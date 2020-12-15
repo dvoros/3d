@@ -10,7 +10,6 @@ color_orange=[255/255, 165/255, 0/255];
 //maxi_station() motor_holes();
 //driver_gear();
 //bearing_inner();
-//large_bearing();
 //#translate([0, 0, -20]) slip_ring();
 
 //cut_x()
@@ -469,84 +468,6 @@ module lidar() {
     // bridge between lenses
     translate([0, 0, bridge_h/2 + base_z])
     cube([base_x-lense_d, bridge_y, bridge_h], center=true);
-}
-
-
-// names are from here: https://www.researchgate.net/figure/Geometry-and-dimensions-of-a-deep-groove-ball-bearing_fig11_222797271
-module large_bearing(inner_d=40, ball_d=6.3, raceway_width=10, outer_d=60, num_balls=14, simple=false) {
-    $fn=50;
-    
-    
-    wall = (outer_d - inner_d - 2*ball_d) / 4;
-    ball_r=ball_d/2;
-    pitch_d=inner_d + 2*(wall + ball_r);
-    angle_per_ball=360/num_balls;
-    
-    echo(inner_d=inner_d);
-    echo(pitch_d=pitch_d);
-    echo(outer_d=outer_d);
-    echo(wall=wall);
-    echo(raceway_width=raceway_width);
-    
-    
-    if (simple) {
-        $fn=200;
-        difference() {
-            cylinder(d=outer_d, h=raceway_width, center=true);
-            cylinder(d=inner_d, h=2*raceway_width, center=true);
-        }
-    } else {
-        // walls
-        
-        difference() {
-            rotate_extrude(angle = 360, convexity = 4, $fn=200)
-            translate([pitch_d/2, 0, 0])
-            difference() {
-                square([ball_d + 2*wall, raceway_width], center=true);
-                square([1.4, raceway_width+9], center=true);
-                circle(d=ball_d);
-            }
-            
-            // cut on the outer part
-            translate([pitch_d, 0, 0])
-            cube([pitch_d, 0.4, pitch_d], center=true);
-        }
-        
-        
-        // separator
-
-        difference() {
-            rotate_extrude(angle = 360, convexity = 2, $fn=200)
-            translate([pitch_d/2, 0, 0])
-            square([0.6, raceway_width-1.4], center=true);
-            
-            // ball cutouts
-            for(rot = [0:angle_per_ball:360]) {
-                rotate([0, 0, rot])
-                translate([pitch_d/2, 0, 0])
-                rotate([45, 0, 0])
-                rotate([0, 90, 0])
-                translate([0, 0, -ball_d/2])
-                linear_extrude(height=ball_d)
-                intersection() {
-                    hull() for (x = [[-1, 1], [-1, -1], [1, 1], [1, -1]]) {
-                    translate([x[0]*0.75*(ball_r + 0.1), x[1]*0.75*(ball_r + 0.1), 0])
-                    circle(d=ball_d/4);
-                };
-                rotate([0, 0, -45])
-                square([ball_d+0.4, 2*ball_d], center=true);
-                }
-            }
-        }
-        
-        // balls
-        
-//        for(rot = [0:angle_per_ball:360]) {
-//            rotate([0, 0, rot])
-//            translate([pitch_d/2, 0, 0])
-//            sphere(d=ball_d-0.2);
-//        }
-    }
 }
 
 module gear(tooth_number=50, width=10, bore=10, optimized=false) {
