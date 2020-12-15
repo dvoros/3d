@@ -8,7 +8,7 @@ color_orange=[255/255, 165/255, 0/255];
 //platform(75/2);
 //motor_platform(75/2);
 //maxi_station() motor_holes();
-//driver_gear();
+driver_gear();
 //bearing_inner();
 //#translate([0, 0, -20]) slip_ring();
 
@@ -41,13 +41,15 @@ color_orange=[255/255, 165/255, 0/255];
 
 //lidar();
 
-motor();
-
 //maxi_station() {
 //    projection()
 //    station_green();
 //    
 //    color("cyan") pcb();
+//    
+//    translate([$motor_x, 0, 0])
+//    mirror([0, 0, 1])
+//    color("orange") motor();
 //}
 
 
@@ -65,6 +67,8 @@ module maxi_station() {
     $motor_d = 54; // diameter of circle on plate for motor
     $motor_h = 40;
     $motor_w = 42;
+    $motor_shaft_h = 23;
+    $motor_shaft_d = 5;
     
     $pcb_x = 72;
     $pcb_y = 72;
@@ -138,6 +142,8 @@ module maxi_station() {
     
     $plate_d = $w5;
     $plate_h = $h1m3;
+    
+    $motor_x = ($base_tooth_num+$driver_tooth_num)/2;
     
     // TODO: re-enable!!!
 //    assert($w5 >= $w5_min, "teeth number is too small to fit");
@@ -252,7 +258,7 @@ module station_green(in_place=false) {
                 circle(d=$plate_d);
                 
                 // motor holder
-                translate([($base_tooth_num+$driver_tooth_num)/2, 0, 0])
+                translate([$motor_x, 0, 0])
                 circle(d=$motor_d);
             }
             
@@ -281,7 +287,7 @@ module station_green(in_place=false) {
         cylinder(d=$m4_head_d+$s2, h=2*$green_h);
         
         // motor bolt cutouts
-        translate([($base_tooth_num+$driver_tooth_num)/2, 0, $plate_h+e])
+        translate([$motor_x, 0, $plate_h+e])
         mirror([0, 0, 1])
         motor_holes();
         
@@ -417,7 +423,10 @@ module slip_ring() {
 }
 
 module motor() {
+    translate([0, 0, -$motor_h/2])
+    cube([$motor_w, $motor_w, $motor_h], center=true);
     
+    cylinder(d=$motor_shaft_d, h=$motor_shaft_h);
 }
 
 module lidar() {
@@ -496,14 +505,20 @@ module driver_gear(tooth_number=25, nut_h = 2.5, nut_w=5.6, h=16) {
 //    render(convexity = 2)
     difference() {
         union() {
+            // inverted
+            translate([0, 0, 10])
+            rotate([0, 180, 0])
+            
+            
             herringbone_gear(1, tooth_number, 10, 0, pressure_angle = 20, helix_angle=30, optimized=false);
+            
             cylinder(d=15, h=h);
         }
         
         // shaft
         translate([0, 0, -e])
         difference() {
-            cylinder(d=5.1, h=30);
+            cylinder(d=5.3, h=30);
             
             translate([5.1/2 - 0.5, -50, 0])
             cube(100);
