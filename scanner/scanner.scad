@@ -14,30 +14,25 @@ color_orange=[255/255, 165/255, 0/255];
 //#translate([0, 0, -20]) slip_ring();
 
 //cut_x()
-maxi_station() {
-    color("blue")
-    station_blue(in_place=true);
-    
-    color("green")
-    station_green(in_place=true);
-    
-    color("purple")
-    station_purple(in_place=true);
-    
-    color(color_orange)
-    station_orange(true);
-
-//    station_bearing();
-    
-    station_bolts();
-    
+//maxi_station() {
+//    color("blue")
+//    station_blue(in_place=true);
+//    
+//    color("green")
+//    station_green(in_place=true);
+//    
+//    color("purple")
+//    station_purple(in_place=true);
+//    
+//    color(color_orange)
+//    station_orange(true);
+//
+////    station_bearing();
+//    
+//    station_bolts();
+//    
 //    color("cyan") pcb(in_place=true);
-};
-
-//maxi_station()
-//m3_with_nut(l=20, nut_z=10);
-//#maxi_station()
-//m4_with_nut(l=20, nut_z=10);
+//};
 
 //maxi_station()
 //station_green();
@@ -46,6 +41,16 @@ maxi_station() {
 //station_blue();
 
 //lidar();
+
+motor();
+
+//maxi_station() {
+//    projection()
+//    station_green();
+//    
+//    color("cyan") pcb();
+//}
+
 
 module maxi_station() {
     $fn=100;
@@ -58,10 +63,12 @@ module maxi_station() {
     $driver_tooth_num = 25;
     $gear_h = 10;
     
-    $motor_d=54; // diameter of circle on plate for motor
-    $motor_h=40;
-    $motor_w=42;
+    $motor_d = 54; // diameter of circle on plate for motor
+    $motor_h = 40;
+    $motor_w = 42;
     
+    $pcb_x = 72;
+    $pcb_y = 72;
     
     
     $slip_ring_small_d = 7.8;
@@ -394,10 +401,10 @@ module m4_with_nut(l, nut_z, center=true) {
         center);
 }
 
-module pcb(in_place=true) {
+module pcb(in_place=false) {
     in_place_z = in_place ? $plate_z : 0;
     translate([0, 0, 5 + in_place_z])
-    cube([72, 72, 10], center=true);
+    cube([$pcb_x, $pcb_y, 10], center=true);
 }
 
 module slip_ring() {
