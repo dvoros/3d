@@ -625,11 +625,15 @@ module station_orange(in_place=false) {
             cylinder(d=$m4_head_d+2*$s2, h=$orange_h);
         }
         
-        // magnet slot
-        rotate([0, 0, 45])
-        translate([$bolt_outer_r, 0, $orange_h+e])
-        mirror([0, 0, 1])
-        magnet_slot();
+        // magnet slot and notch
+        rotate([0, 0, 45]) {
+            translate([$bolt_outer_r, 0, $orange_h+e])
+            mirror([0, 0, 1])
+            magnet_slot();
+            
+            translate([$w5/2, 0, 0])
+            cylinder(d=3, h=2*$orange_h, center=true);
+        }
     }
 }
 
