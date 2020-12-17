@@ -8,7 +8,7 @@ color_orange=[255/255, 165/255, 0/255];
 //platform(75/2);
 //motor_platform(75/2);
 //maxi_station() motor_holes();
-//driver_gear();
+//driver_gear(tooth_number=20, inverted=true);
 //bearing_inner();
 //#translate([0, 0, -20]) slip_ring();
 
@@ -33,9 +33,9 @@ color_orange=[255/255, 165/255, 0/255];
 //    color("cyan") pcb(in_place=true);
 //};
 
-maxi_station()
+//maxi_station()
 //station_green();
-station_orange();
+//station_orange();
 //station_purple();
 //station_blue();
 
@@ -54,9 +54,10 @@ station_orange();
 //    mini_stand();
 //}
 
-//cut_x()
-//maxi_station()
-//mini_stand();
+maxi_station()
+mini_stand();
+
+
 //ygear_plug_m4();
 //ybearing_plug_m4();
 //y_gear();
@@ -995,17 +996,18 @@ module plug(h=$ybearing_h, gap=$s5) {
     }
 }
 
-module driver_gear(tooth_number=25, nut_h = 2.5, nut_w=5.6, h=16) {
+module driver_gear(tooth_number=25, nut_h = 2.5, nut_w=5.6, h=16, inverted=true) {
     $fn=50;
+    
+    invert_rotation = inverted ? 180 : 0;
     
 //    render(convexity = 2)
     difference() {
         union() {
             // inverted
-            translate([0, 0, 10])
-            rotate([0, 180, 0])
-            
-            
+            translate([0, 0, 5])
+            rotate([0, invert_rotation, 0])
+            translate([0, 0, -5])
             herringbone_gear(1, tooth_number, 10, 0, pressure_angle = 20, helix_angle=30, optimized=false);
             
             cylinder(d=15, h=h);
