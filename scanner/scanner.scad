@@ -8,7 +8,7 @@ color_orange=[255/255, 165/255, 0/255];
 //platform(75/2);
 //motor_platform(75/2);
 //maxi_station() motor_holes();
-driver_gear();
+//driver_gear();
 //bearing_inner();
 //#translate([0, 0, -20]) slip_ring();
 
@@ -26,7 +26,7 @@ driver_gear();
 //    color(color_orange)
 //    station_orange(true);
 //
-////    station_bearing();
+////    xbearing();
 //    
 //    station_bolts();
 //    
@@ -45,23 +45,88 @@ driver_gear();
 //    projection()
 //    station_green();
 //    
-//    color("cyan") pcb();
+//    % pcb();
 //    
 //    translate([$motor_x, 0, 0])
 //    mirror([0, 0, 1])
 //    color("orange") motor();
+//    
+//    stand1();
 //}
+
+//cut_x()
+maxi_station()
+//ygear_plug_m4();
+mini_stand();
+//y_gear();
+
+//maxi_station()
+//hall_hole();
+
+
+
+module hall_hole() {
+    $fn=30;
+    
+    h=$h1m3;
+    hall_d=4.4;
+    hall_l=4;
+    
+    magnet_d=3;
+    magnet_h=1.7;
+    
+    hole_l=10;
+    entrance_deg=75;
+    
+
+   translate([0, 0, 0.4 + hall_d/2-e])
+    union() {
+        translate([0, 0, -0.4/2])
+        cube([hall_d, hall_d, hall_d+0.4], center=true);
+        
+        rotate([0, 90, 0])
+        cylinder(d=hall_d, h=hole_l);
+        
+        x=cos(entrance_deg)*hall_d;
+        y=sin(entrance_deg)*hall_d;
+        translate([hole_l-x/2, 0, -(hall_d-y)/2])
+        rotate([0, entrance_deg, 0])
+        cylinder(d=hall_d, h=20);
+    }
+    
+    
+    
+//    difference() {
+//        cube([8, 20, h], center=true);
+//        
+//        rotate([60, 0, 0])
+//        translate([0, 0, -50])
+//        cylinder(d=hall_d+$s2, h=100);
+//        
+//        translate([0, 5, h/2-magnet_h-$s3])
+//        cylinder(d=magnet_d+$s2, h=100);
+//    }
+}
 
 
 module maxi_station() {
     $fn=100;
     
-    $bearing_inner_d = 50;
-    $bearing_outer_d = 72;
-    $bearing_h = 12;
+    $xbearing_inner_d = 50;
+    $xbearing_outer_d = 72;
+    $xbearing_h = 12;
+    
+    $ybearing_inner_d = 6;
+    $ybearing_outer_d = 13;
+    $ybearing_h = 5;
     
     $base_tooth_num = 100;
     $driver_tooth_num = 25;
+    
+    $stand_tooth_num = 60;
+    
+    $bolt_ygear_r = 16;
+    
     $gear_h = 10;
     
     $motor_d = 54; // diameter of circle on plate for motor
@@ -132,10 +197,10 @@ module maxi_station() {
     $h3 = 0.8;
     $h4 = $slip_ring_plate_h + $s5;
     
-    $w1 = $bearing_inner_d - $s2;
-    $w2 = $bearing_inner_d + ($bearing_outer_d - $bearing_inner_d) / 3;
-    $w3 = $bearing_outer_d - ($bearing_outer_d - $bearing_inner_d) / 3;
-    $w4 = $bearing_outer_d + $s2;
+    $w1 = $xbearing_inner_d - $s2;
+    $w2 = $xbearing_inner_d + ($xbearing_outer_d - $xbearing_inner_d) / 3;
+    $w3 = $xbearing_outer_d - ($xbearing_outer_d - $xbearing_inner_d) / 3;
+    $w4 = $xbearing_outer_d + $s2;
     $w5_min = $w4 + 2*$h2m4;
     $w5 = $base_tooth_num + 2;
     
@@ -165,23 +230,169 @@ module maxi_station() {
     $green_h =
         $plate_h // plate height
         + $s5 + $orange_h // space for ORANGE
-        + ($bearing_h/2 - $s4); // within bearing
+        + ($xbearing_h/2 - $s4); // within bearing
     $plate_z = $green_h + $s4;
         
     // height of blue part (added up from top to bottom)
-    $blue_h = ($bearing_h/2 - $s4) + $h1m3;
+    $blue_h = ($xbearing_h/2 - $s4) + $h1m3;
     
     $purple_bottom_h = $h1m3/2;
     // height of purple part (added up from top to bottom)
-    $purple_h = $purple_bottom_h + $h4 + $h1m3 + ($bearing_h - $s4);
+    $purple_h = $purple_bottom_h + $h4 + $h1m3 + ($xbearing_h - $s4);
     
     
     
     children();
 }
 
+module y_gear() {
+    difference() {
+        gear(tooth_number=$stand_tooth_num, width=$gear_h, bore=0);
+        cylinder(d=$ybearing_outer_d+$s3, h=$gear_h);
+        
+        z_rot_copy(r=$bolt_ygear_r)
+        union() {
+            // body of bolt
+            cylinder(d=$m3_body_d+2*$s2, h=$gear_h);
+          
+            // nut pocket
+            hexagon(
+                ($m3_nut_d+2*$s2)/2,
+                $gear_h/2
+            );
+        }
+    }
+}
+
+module mini_stand() {
+    dist=50;
+    h=50;
+    y=30;
+    
+    x=dist+2*$h1m4;
+    
+    
+    
+    mount_x=dist-2*$s5-$gear_h;
+    mount_y=($stand_tooth_num-2)/sqrt(2);
+    mount_h=$ybearing_h;
+    
+    ledge=($ybearing_outer_d-$ybearing_inner_d)/2/3;
+    
+    legs();
+    
+//    ygear_plug_m4();
+    
+    translate([-mount_x/2 + dist/2 - $s5, 0, 0])
+    mount();
+    
+    
+    // bearing+plug
+    translate([dist/2 - $ybearing_h/2 - $s5, 0])
+    rotate([0, -90, 0])
+    {
+        ybearing_plug_m4();
+        ybearing();
+    }
+
+    // gear+bearings+plug
+    translate([-dist/2 + $gear_h/2 + $s5, 0, 0])
+    rotate([0, 90, 0])
+    {
+        translate([0, 0, $ybearing_h/2])
+        ybearing();
+        translate([0, 0, -$ybearing_h/2])
+        ybearing();
+        ygear_plug_m4();
+    }
+    
+    translate([-dist/2 + $s5, 0, 0])
+    rotate([0, 90, 0])
+    rotate([0, 0, 45])
+    y_gear();
+    
+    module mount() {
+        difference() {
+            union () {
+                translate([-mount_x/2, -mount_y/2 , -mount_y/2 - mount_h])
+                difference() {
+                    cube([mount_x, mount_y, mount_y+mount_h]);
+                    translate([mount_h, -mount_y, mount_h])
+                    cube([mount_x-2*mount_h, 3*mount_y, 3*mount_y]);
+                }
+                
+                translate([mount_x/2-mount_h-2, 0, 0])
+                rotate([0, 90, 0])
+                cylinder(d=$ybearing_outer_d+$s3+3, h=mount_h);
+            }
+            
+            // holes for mounting on gear
+            translate([-mount_x/2+mount_h+e, 0, 0])
+            rotate([0, -90, 0])
+            z_rot_copy(r=$bolt_ygear_r, extra_z=45)
+            union() {
+                // body of bolt
+                cylinder(d=$m3_body_d+2*$s2, h=2*mount_h);
+              
+                // bolt_head pocket
+                cylinder(d=$m3_head_d+2*$s2, h=mount_h/2);
+            }
+            
+            // hole for bolt on idle and gear side
+            translate([mount_x/2-mount_h, 0, 0])
+            rotate([0, 90, 0])
+            cylinder(d=$ybearing_outer_d+$s3, h=mount_x);
+            rotate([0, 90, 0])
+            cylinder(d=$ybearing_outer_d-2*ledge, h=2*mount_x, center=true);
+
+        }
+        
+    }
+   
+    module legs() {
+        difference() {
+            translate([0, 0, -h+$h2m4/2])
+            difference() {
+                linear_extrude(height=h, scale=[1, $h2m4/y])
+                square([x, y], center=true);
+                
+                // body
+                translate([0, 0, h/2+$h1m4])
+                cube([dist, 2*y, h], center=true);
+            }
+            
+            // bolts
+            rotate([0, 90, 0])
+            cylinder(d=$m4_body_d+2*$s2, h=2*x, center=true);
+            
+            // nut pocket
+            mirror_x()
+            translate([dist/2 + $h1m4/2, 0, 0])
+            rotate([0, 90, 0])
+            hexagon(
+                ($m4_nut_d+2*$s2)/2,
+                h
+            );
+        }
+    }
+    
+}
+
+module stand1(in_place=false) {
+    wall_d=20;
+    
+//    mirror_x()
+    mirror_y()
+    #translate([$pcb_x/2+$s5, $motor_w/2+$s5])
+    hull() {
+        translate([wall_d, wall_d/2, 0])
+        circle(d=wall_d);
+        square([wall_d/2, wall_d]);
+    }
+}
+
 module station_orange(in_place=false) {
-    in_place_z = in_place ? $bearing_h/2 : 0;
+    in_place_z = in_place ? $xbearing_h/2 : 0;
     translate([0, 0, in_place_z])
     difference() {
         cylinder(d=$w5, h=$orange_h);
@@ -204,11 +415,11 @@ module station_orange(in_place=false) {
 //       - border around slip-ring on the bottom to make sure it
 //         is centered when attaching
 module station_purple(in_place=false) {
-    in_place_z = in_place ? -($purple_h + $s4 - $bearing_h/2) : 0;
+    in_place_z = in_place ? -($purple_h + $s4 - $xbearing_h/2) : 0;
     translate([0, 0, in_place_z])
     difference() {
         union() {
-            base_h= $purple_bottom_h + $h4 + $h1m3 + ($bearing_h-$gear_h) - $s4;
+            base_h= $purple_bottom_h + $h4 + $h1m3 + ($xbearing_h-$gear_h) - $s4;
             
             cylinder(d=$w5, h=base_h);
             
@@ -330,24 +541,34 @@ module station_bolts() {
     m3_with_nut(l=$bolt_inner_body_len, nut_z=$bolt_inner_nut_z, center=true);
     
     // outer
-    translate([0, 0, -$bolt_outer_body_len+$bearing_h/2+$orange_h/2])
+    translate([0, 0, -$bolt_outer_body_len+$xbearing_h/2+$orange_h/2])
     z_rot_copy(r=$bolt_outer_r)
     m4_with_nut(l=$bolt_outer_body_len, nut_z=$bolt_outer_nut_z, center=false);
 }
 
-module station_bearing() {
+module xbearing() {
     translate([0, 0, -e])
     difference() {
-        cylinder(d=$bearing_outer_d, h=$bearing_h, center=true);
+        cylinder(d=$xbearing_outer_d, h=$xbearing_h, center=true);
         
-        cylinder(d=$bearing_inner_d, h=3*$bearing_h, center=true);
+        cylinder(d=$xbearing_inner_d, h=3*$xbearing_h, center=true);
+    }
+}
+
+
+module ybearing() {
+    translate([0, 0, -e])
+    difference() {
+        cylinder(d=$ybearing_outer_d, h=$ybearing_h, center=true);
+        
+        cylinder(d=$ybearing_inner_d, h=3*$ybearing_h, center=true);
     }
 }
 
 // Part of green and blue that's inside the bearing.
 // Doesn't include holes for the bolts.
 module station_inside_bearing() {
-    h= $bearing_h/2 - $s4;
+    h= $xbearing_h/2 - $s4;
     union() {
         // outer ring
         difference() {
@@ -491,11 +712,29 @@ module gear(tooth_number=50, width=10, bore=10, optimized=false) {
     herringbone_gear(1, tooth_number, width, bore, pressure_angle = 20, helix_angle=30, optimized=optimized);
 }
 
-module bearing_inner() {
+module ybearing_plug_m3() {
     $fn=50;
     difference() {
         cylinder(d=5.8, h=9.8);
         cylinder(d=3.4, h=100, center=true);
+    }
+}
+
+module ygear_plug_m4() {
+    ybearing_plug_m4(h=$gear_h);
+}
+
+module ybearing_plug_m4(h=$ybearing_h) {
+    $fn=50;
+    ledge=($ybearing_outer_d-$ybearing_inner_d)/2/3;
+    
+    translate([0, 0, -h/2-$s5])
+    difference() {
+        union() {
+            cylinder(d=$ybearing_inner_d - $s2, h=h + $s5);
+            cylinder(d=$ybearing_inner_d+2*ledge, h=$s5);
+        }
+        cylinder(d=$m4_body_d+2*$s3, h=100, center=true);
     }
 }
 
@@ -557,74 +796,4 @@ module motor_holes() {
         circle(d=24);
     }
     
-}
-
-module motor_platform(dist, h=6, bolt_head_d = 5.7, nut_h = 2.5) {
-    $fn=60;
-    difference() {
-        union() {
-            // motor baseline
-            linear_extrude(height=3, convexity=3)
-            difference() {
-                hull() {
-                    mirror_x()
-                    mirror_y()
-                    translate([-31/2, -31/2, 0])
-                    circle(d=8);
-                }
-                mirror_x()
-                mirror_y()
-                translate([-31/2, -31/2, 0])
-                circle(d=3.4);
-            }
-            
-            // motor ledge
-            cylinder(d=34, h=h);
-            
-            // gear
-            linear_extrude(height=h)
-            hull() {
-                translate([dist, 0, 0])
-                circle(r=10);
-                circle(r=10);
-            }
-        }
-        
-        translate([0, 0, -e])
-        cylinder(d=24, h=100);
-        
-        // gear
-        translate([dist, 0, 0])
-        cylinder(d=3.2, center=true, h=3*h);
-        translate([dist, 0, -e])
-        cylinder(d=bolt_head_d, h=nut_h);
-    }
-    
-    
-}
-
-module platform(dist, nut_h = 2.5, bolt_head_d = 5.5, height = 6) {
-    $fn = 40;
-    difference() {
-    linear_extrude(height=height)
-    hull() {
-        translate([dist, 0, 0])
-        circle(r=10);
-        circle(r=10);
-    }
-    translate([dist, 0, 0])
-    cylinder(d=3.2, center=true, h=3*height);
-    cylinder(d=3.2, center=true, h=3*height);
-
-
-    translate([0, 0, -e])
-    cylinder(d=bolt_head_d, h=nut_h);
-    translate([dist, 0, -e])
-    cylinder(d=bolt_head_d, h=nut_h);
-
-    translate([0, 0, height-nut_h+e])
-    hexagon(3.4, nut_h);
-    translate([dist, 0, height-nut_h+e])
-    hexagon(3.4, nut_h);
-    }
 }
