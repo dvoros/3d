@@ -40,22 +40,23 @@ color_orange=[255/255, 165/255, 0/255];
 //station_blue();
 
 
-//maxi_station() {
-//    projection()
-//    station_green();
-//    
-//    % pcb();
-//    
-//    translate([$xmotor_x, 0, 0])
-//    mirror([0, 0, 1])
-//    % motor();
-//    
-////    stand1();
-//}
+maxi_station() {
+    projection()
+    station_green();
+    
+    % pcb();
+    
+    translate([$xmotor_x, 0, 0])
+    mirror([0, 0, 1])
+    % motor();
+    
+
+    mini_stand();
+}
 
 //cut_x()
-maxi_station()
-mini_stand();
+//maxi_station()
+//mini_stand();
 //ygear_plug_m4();
 //ybearing_plug_m4();
 //y_gear();
@@ -210,6 +211,7 @@ module maxi_station() {
     $w5_min = $w4 + 2*$h2m4;
     $w5 = $base_tooth_num + 2;
     
+    $leg_pcb_gap = 2*$s5;
     
     $plate_d = $w5;
     $plate_h = $h1m3;
@@ -286,12 +288,11 @@ module mini_stand() {
 // shaft_z: shaft distance from plate
 // y: 
 module stand(dist, shaft_z, y) {
-    gap = 2*$s5;
     x=dist+2*$h1m4;
     
     
     
-    mount_x=dist-2*gap-$gear_h;
+    mount_x=dist-2*$leg_pcb_gap-$gear_h;
     mount_y=($stand_tooth_num-2)/sqrt(2);
     mount_h=$ybearing_h;
     
@@ -309,18 +310,25 @@ module stand(dist, shaft_z, y) {
     
 //    mount();
     
+    color("green")
     idle_leg();
+    color("red")
     driver_leg();
     %ymotor();
     
     
+    
+    
     translate([0, 0, shaft_z]) {
-        translate([-mount_x/2 + dist/2 - gap, 0, 0])
-        mount();
+        translate([-mount_x/2 + dist/2 - $leg_pcb_gap, 0, 0]) {
+            mount();
+            translate([0, 0, -y/2 - mount_h/2])
+            %lidar();
+        }
         
         
         // bearing+plug
-        translate([dist/2 - $ybearing_h/2 - gap, 0])
+        translate([dist/2 - $ybearing_h/2 - $leg_pcb_gap, 0])
         rotate([0, -90, 0])
         {
             ybearing_plug_m4();
@@ -328,7 +336,7 @@ module stand(dist, shaft_z, y) {
         }
 
         // gear+bearings+plug
-        translate([-dist/2 + $gear_h/2 + gap, 0, 0])
+        translate([-dist/2 + $gear_h/2 + $leg_pcb_gap, 0, 0])
         rotate([0, 90, 0])
         {
             translate([0, 0, $ybearing_h/2])
@@ -338,7 +346,7 @@ module stand(dist, shaft_z, y) {
             ygear_plug_m4();
         }
         
-        translate([-dist/2 + gap, 0, 0])
+        translate([-dist/2 + $leg_pcb_gap, 0, 0])
         rotate([0, 90, 0])
         rotate([0, 0, 45])
         y_gear();
@@ -352,7 +360,7 @@ module stand(dist, shaft_z, y) {
         motor();
         
         // driver gear
-        translate([-dist/2 + $gear_h/2 + gap, 0, motor_plate_dist])
+        translate([-dist/2 + $gear_h/2 + $leg_pcb_gap, 0, motor_plate_dist])
         rotate([0, 90, 0])
         translate([0, 0, -$gear_h/2])
         driver_gear(tooth_number=20);
@@ -367,7 +375,7 @@ module stand(dist, shaft_z, y) {
         
         
         // bottom
-        translate([-$pcb_x/2-gap, 0, 0])
+        translate([-$pcb_x/2-$leg_pcb_gap, 0, 0])
         difference() {
             union() {
                 // base
@@ -430,8 +438,7 @@ module stand(dist, shaft_z, y) {
     module idle_leg() {
         h=shaft_z+$h2m4/2;
         
-        color("green")
-        translate([$pcb_x/2+gap, 0, leg_bottom_width])
+        translate([$pcb_x/2+$leg_pcb_gap, 0, leg_bottom_width])
         rotate([90, 0, 90])
         difference() {
             linear_extrude(height=$h1m3)
@@ -470,9 +477,8 @@ module stand(dist, shaft_z, y) {
         
         
         // bottom
-        color("green")
         mirror_y()
-        translate([$pcb_x/2+gap, $motor_w/2+$s5])
+        translate([$pcb_x/2+$leg_pcb_gap, $motor_w/2+$s5])
         difference() {
             linear_extrude(height=leg_bottom_width)
             leg_zprojection();
@@ -489,14 +495,6 @@ module stand(dist, shaft_z, y) {
         // bolt head pocket
         translate([$leg_wall_d, $leg_wall_d/2, leg_bottom_width/2])
         cylinder(d=$m4_head_d+2*$s2, h=leg_bottom_width);
-    }
-   
-    module leg_zprojection() {
-        hull() {
-            translate([$leg_wall_d, $leg_wall_d/2, 0])
-            circle(d=$leg_wall_d);
-            square([$leg_wall_d/2, $leg_wall_d]);
-        }
     }
     
     module mount() {
@@ -597,6 +595,14 @@ module stand(dist, shaft_z, y) {
     
 }
 
+module leg_zprojection() {
+    hull() {
+        translate([$leg_wall_d, $leg_wall_d/2, 0])
+        circle(d=$leg_wall_d);
+        square([$leg_wall_d/2, $leg_wall_d]);
+    }
+}
+
 module stand1(in_place=false) {
     $leg_wall_d=20;
     
@@ -692,7 +698,10 @@ module station_green(in_place=false) {
                 circle(d=$motor_d);
                 
                 // legs
-                
+                mirror_x()
+                mirror_y()
+                translate([$pcb_x/2+$leg_pcb_gap, $motor_w/2+$s5])
+                leg_zprojection();
             }
             
             // middle part that makes space for ORANGE
@@ -726,6 +735,24 @@ module station_green(in_place=false) {
         
         // slip ring
         cylinder(d=$slip_ring_small_d, h=$green_h);
+        
+        // leg bolts with nut pocket
+        mirror_x()
+        mirror_y()
+        translate([$pcb_x/2+$leg_pcb_gap, $motor_w/2+$s5])
+        translate([$leg_wall_d, $leg_wall_d/2, 0])
+        union() {
+            cylinder(d=$m4_body_d+2*$s2, h=3*$h1m3, center=true);
+            // TODO: we're putting M4 nut into plate that's supposed to only hold M3...
+            translate([0, 0, $h1m3/2])
+            hexagon(
+                ($m4_nut_d+2*$s2)/2,
+                $h1m3
+            );
+        }
+        
+//        translate([$leg_wall_d, $leg_wall_d/2, leg_bottom_width/2])
+//        cylinder(d=$m4_head_d+2*$s2, h=leg_bottom_width);
     }
 }
 
