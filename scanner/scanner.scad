@@ -33,26 +33,26 @@ color_orange=[255/255, 165/255, 0/255];
 //    color("cyan") pcb(in_place=true);
 //};
 
-//maxi_station()
+maxi_station()
 //station_green();
-//station_orange();
+station_orange();
 //station_purple();
 //station_blue();
 
 
-maxi_station() {
-    projection()
-    station_green();
-    
-    % pcb();
-    
-    translate([$xmotor_x, 0, 0])
-    mirror([0, 0, 1])
-    % motor();
-    
-
-    mini_stand();
-}
+//maxi_station() {
+//    projection()
+//    station_green();
+//    
+//    % pcb();
+//    
+//    translate([$xmotor_x, 0, 0])
+//    mirror([0, 0, 1])
+//    % motor();
+//    
+//
+//    mini_stand();
+//}
 
 //cut_x()
 //maxi_station()
@@ -73,9 +73,6 @@ module hall_hole() {
     hall_d=4.4;
     hall_l=4;
     
-    magnet_d=3;
-    magnet_h=1.7;
-    
     hole_l=10;
     entrance_deg=75;
     
@@ -94,19 +91,10 @@ module hall_hole() {
         rotate([0, entrance_deg, 0])
         cylinder(d=hall_d, h=20);
     }
-    
-    
-    
-//    difference() {
-//        cube([8, 20, h], center=true);
-//        
-//        rotate([60, 0, 0])
-//        translate([0, 0, -50])
-//        cylinder(d=hall_d+$s2, h=100);
-//        
-//        translate([0, 5, h/2-magnet_h-$s3])
-//        cylinder(d=magnet_d+$s2, h=100);
-//    }
+}
+
+module magnet_slot() {
+    cylinder(d=$magnet_d+$s2, h=$magnet_h+$s1);
 }
 
 
@@ -141,6 +129,9 @@ module maxi_station() {
     
     $pcb_x = 72;
     $pcb_y = 72;
+    
+    $magnet_d=3;
+    $magnet_h=1.7;
     
     
     $slip_ring_small_d = 7.8;
@@ -633,6 +624,12 @@ module station_orange(in_place=false) {
             translate([0, 0, $orange_h/2])
             cylinder(d=$m4_head_d+2*$s2, h=$orange_h);
         }
+        
+        // magnet slot
+        rotate([0, 0, 45])
+        translate([$bolt_outer_r, 0, $orange_h+e])
+        mirror([0, 0, 1])
+        magnet_slot();
     }
 }
 
@@ -723,10 +720,14 @@ module station_green(in_place=false) {
             cylinder(d=$m3_head_d+2*$s2, h=$green_h+$s4-$bolt_inner_body_len/2);
         }
         
-        // assembly holes for orange bolts
-        mirror_y()
+        // assembly hole for orange bolts
         translate([0, $bolt_outer_r, -e])
         cylinder(d=$m4_head_d+$s2, h=2*$green_h);
+        
+        // hall sensor
+        translate([0, -$bolt_outer_r, $plate_h])
+        mirror([0, 0, 1])
+        hall_hole();
         
         // motor bolt cutouts
         translate([$xmotor_x, 0, $plate_h+e])
