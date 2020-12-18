@@ -75,7 +75,7 @@ module hall_hole() {
     hall_l=4;
     
     hole_l=10;
-    entrance_deg=75;
+    entrance_deg=80;
     
 
    translate([0, 0, 0.4 + hall_d/2-e])
@@ -84,13 +84,15 @@ module hall_hole() {
         cube([hall_d, hall_d, hall_d+0.4], center=true);
         
         rotate([0, 90, 0])
-        cylinder(d=hall_d, h=hole_l);
+        translate([-hall_d/2, -hall_d/2, 0])
+        cube([hall_d, hall_d, hole_l]);
         
         x=cos(entrance_deg)*hall_d;
         y=sin(entrance_deg)*hall_d;
         translate([hole_l-x/2, 0, -(hall_d-y)/2])
         rotate([0, entrance_deg, 0])
-        cylinder(d=hall_d, h=20);
+        translate([-hall_d/2, -hall_d/2, 0])
+        cube([hall_d, hall_d, 30]);
     }
 }
 
@@ -133,6 +135,10 @@ module maxi_station() {
     
     $magnet_d=3;
     $magnet_h=1.7;
+    
+    $mount_y=($stand_tooth_num-2)/sqrt(2); // depth of mount
+    $mount_h=$ybearing_h; // wall width for mount (needs to fit bearing)
+    $mount_magnet_shaft_dist=$mount_y/2;
     
     
     $slip_ring_small_d = 7.8;
@@ -285,8 +291,7 @@ module stand(dist, shaft_z, y) {
     
     
     mount_x=dist-2*$leg_pcb_gap-$gear_h;
-    mount_y=($stand_tooth_num-2)/sqrt(2);
-    mount_h=$ybearing_h;
+    
     
     leg_bottom_width=$h1m4;
     
@@ -314,7 +319,7 @@ module stand(dist, shaft_z, y) {
     translate([0, 0, shaft_z]) {
         translate([-mount_x/2 + dist/2 - $leg_pcb_gap, 0, 0]) {
             mount();
-            translate([0, 0, -y/2 - mount_h/2])
+            translate([0, 0, -y/2 - $mount_h/2])
             %lidar();
         }
         
@@ -465,6 +470,11 @@ module stand(dist, shaft_z, y) {
                 ($m4_nut_d+2*$s2)/2,
                 $h1m3
             );
+            
+            // hall hole
+            translate([0, sz-$mount_magnet_shaft_dist, 0])
+            mirror([1, 0, 0])
+            hall_hole();
         }
         
         
@@ -493,11 +503,11 @@ module stand(dist, shaft_z, y) {
         difference() {
             union () {
                 intersection() {
-                    translate([-mount_x/2, -mount_y/2 , -mount_y/2 - mount_h])
+                    translate([-mount_x/2, -$mount_y/2 , -$mount_y/2 - $mount_h])
                     difference() {
-                        cube([mount_x, mount_y, mount_y+mount_h]);
-                        translate([mount_h, -mount_y, mount_h])
-                        cube([mount_x-2*mount_h, 3*mount_y, 3*mount_y]);
+                        cube([mount_x, $mount_y, $mount_y+$mount_h]);
+                        translate([$mount_h, -$mount_y, $mount_h])
+                        cube([mount_x-2*$mount_h, 3*$mount_y, 3*$mount_y]);
                     }
                     
                     // remove parts that would reach out from behind the gear
@@ -505,25 +515,25 @@ module stand(dist, shaft_z, y) {
                     cylinder(d=$stand_tooth_num, h=3*mount_x, center=true);
                 }
                 
-                translate([mount_x/2-mount_h-2, 0, 0])
+                translate([mount_x/2-$mount_h-2, 0, 0])
                 rotate([0, 90, 0])
-                cylinder(d=$ybearing_outer_d+$s3+3, h=mount_h);
+                cylinder(d=$ybearing_outer_d+$s3+3, h=$mount_h);
             }
             
             // holes for mounting on gear
-            translate([-mount_x/2+mount_h+e, 0, 0])
+            translate([-mount_x/2+$mount_h+e, 0, 0])
             rotate([0, -90, 0])
             z_rot_copy(r=$bolt_ygear_r, extra_z=45)
             union() {
                 // body of bolt
-                cylinder(d=$m3_body_d+2*$s2, h=2*mount_h);
+                cylinder(d=$m3_body_d+2*$s2, h=2*$mount_h);
               
                 // bolt_head pocket
-                cylinder(d=$m3_head_d+2*$s2, h=mount_h/2);
+                cylinder(d=$m3_head_d+2*$s2, h=$mount_h/2);
             }
             
             // hole for bolt on idle and gear side
-            translate([mount_x/2-mount_h, 0, 0])
+            translate([mount_x/2-$mount_h, 0, 0])
             rotate([0, 90, 0])
             cylinder(d=$ybearing_outer_d+$s3, h=mount_x);
             rotate([0, 90, 0])
@@ -541,18 +551,21 @@ module stand(dist, shaft_z, y) {
             translate([$lidar_bolts_x/2, $lidar_bolts_y/2, 0])
             union() {
                 // body of bolt
-                cylinder(d=$m3_body_d+2*$s2, h=3*mount_y, center=true);
+                cylinder(d=$m3_body_d+2*$s2, h=3*$mount_y, center=true);
                 
                 // nut pocket
-                translate([0, 0,-mount_y/2 - 1.5*mount_h])
+                translate([0, 0,-$mount_y/2 - 1.5*$mount_h])
                 hexagon(
                     ($m3_nut_d+2*$s2)/2,
-                    mount_h
+                    $mount_h
                 );
             }
-
+            
+            // magnet socket
+            translate([mount_x/2+e, 0, -$mount_magnet_shaft_dist])
+            rotate([0, -90, 0])
+            #magnet_slot();
         }
-        
     }
     
 //    module test_stand_legs() {
