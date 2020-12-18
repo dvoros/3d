@@ -10,7 +10,10 @@ color_orange=[255/255, 165/255, 0/255];
 //maxi_station() motor_holes();
 //driver_gear(tooth_number=20, inverted=true);
 //bearing_inner();
-//#translate([0, 0, -20]) slip_ring();
+
+
+maxi_station()
+slip_ring();
 
 //cut_x()
 //maxi_station() {
@@ -54,8 +57,8 @@ color_orange=[255/255, 165/255, 0/255];
 //    mini_stand();
 //}
 
-maxi_station()
-mini_stand();
+//maxi_station()
+//mini_stand();
 
 
 //ygear_plug_m4();
@@ -142,8 +145,12 @@ module maxi_station() {
     
     
     $slip_ring_small_d = 7.8;
+    $slip_ring_small_h = 8.5;
+    $slip_ring_plate_d = 43.8;
+    $slip_ring_plate_h = 2.5;
     $slip_ring_large_d = 21.8;
-    $slip_ring_plate_h = 0; // TODO: is slipring plate on the inside?
+    $slip_ring_large_h = 28-$slip_ring_plate_h;
+    $slip_ring_wire_slack = 8; // necessary distance for wires to bend
     
     $lidar_bolts_x=28.6;
     $lidar_bolts_y=27.4;
@@ -902,13 +909,13 @@ module pcb(in_place=false) {
 }
 
 module slip_ring() {
-    cylinder(d=21.8, h=26.5);
+    cylinder(d=$slip_ring_large_d, h=$slip_ring_large_h);
     
-    translate([0, 0, 19])
-    cylinder(d=44.5, h=3); // TODO: 3 was only a guess
+    translate([0, 0, $slip_ring_large_h])
+    cylinder(d=$slip_ring_plate_d, h=$slip_ring_plate_h);
     
-    translate([0, 0, 26.5 - e])
-    cylinder(d=7.8, h=9.5);
+    translate([0, 0, $slip_ring_large_h+$slip_ring_plate_h])
+    cylinder(d=$slip_ring_small_d, h=$slip_ring_small_h);
 }
 
 module motor() {
