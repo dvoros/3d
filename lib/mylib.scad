@@ -26,9 +26,10 @@ module mirror_z() {
     children();
 }
 
-module z_rot_copy(r=0, arr=[0:90:360], extra_z=0) {
+module z_rot_copy(r=0, deg=90, offset_deg=0) {
+    arr = [0:deg:360];
     for(rot=arr) {
-        rotate([0, 0, rot+extra_z])
+        rotate([0, 0, rot+offset_deg])
         translate([r, 0, 0])
         children();
     }

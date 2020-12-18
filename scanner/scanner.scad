@@ -4,6 +4,8 @@ use <../lib/mylib.scad>;
 e=0.01;
 color_orange=[255/255, 165/255, 0/255];
 
+$fn=100;
+
 //gear();
 //platform(75/2);
 //motor_platform(75/2);
@@ -12,8 +14,8 @@ color_orange=[255/255, 165/255, 0/255];
 //bearing_inner();
 
 
-maxi_station()
-slip_ring();
+//maxi_station()
+//slip_ring();
 
 //cut_x()
 //maxi_station() {
@@ -31,16 +33,19 @@ slip_ring();
 //
 ////    xbearing();
 //    
-//    station_bolts();
+////    station_bolts();
 //    
-//    color("cyan") pcb(in_place=true);
+////    color("cyan") pcb(in_place=true);
+//    
+//    %slip_ring(in_place=true);
 //};
 
-//maxi_station()
+
+maxi_station()
+//station_purple();
 //station_green();
 //station_orange();
-//station_purple();
-//station_blue();
+station_blue();
 
 
 //maxi_station() {
@@ -71,8 +76,6 @@ slip_ring();
 
 
 module hall_hole() {
-    $fn=30;
-    
     h=$h1m3;
     hall_d=4.4;
     hall_l=4;
@@ -105,8 +108,6 @@ module magnet_slot() {
 
 
 module maxi_station() {
-    $fn=100;
-    
     $xbearing_inner_d = 50;
     $xbearing_outer_d = 72;
     $xbearing_h = 12;
@@ -150,7 +151,10 @@ module maxi_station() {
     $slip_ring_plate_h = 2.5;
     $slip_ring_large_d = 21.8;
     $slip_ring_large_h = 28-$slip_ring_plate_h;
+    $slip_ring_hole_r = $slip_ring_plate_d/2-4.2; // radius of the circle that the holes lie on
+    $slip_ring_hole_d = 5.5; // diameter of holes
     $slip_ring_wire_slack = 8; // necessary distance for wires to bend
+    $slip_ring_conduit_d = 8;
     
     $lidar_bolts_x=28.6;
     $lidar_bolts_y=27.4;
@@ -180,7 +184,7 @@ module maxi_station() {
     
     // Bolt length
     $bolt_inner_body_len = 20;
-    $bolt_outer_body_len = 20;
+    $bolt_outer_body_len = 35;
     
     
     // "no slack"
@@ -207,7 +211,7 @@ module maxi_station() {
     $h2m4 = ($m4_nut_d + $s3) * 2; echo($h2m4=$h2m4);
     // rigid wall width
     $h3 = 0.8;
-    $h4 = $slip_ring_plate_h + $s5;
+    $h4 = $m4_head_h + 2*$s5;
     
     $w1 = $xbearing_inner_d - $s2;
     $w2 = $xbearing_inner_d + ($xbearing_outer_d - $xbearing_inner_d) / 3;
@@ -250,7 +254,7 @@ module maxi_station() {
     // height of blue part (added up from top to bottom)
     $blue_h = ($xbearing_h/2 - $s4) + $h1m3;
     
-    $purple_bottom_h = $h1m3/2;
+    $purple_bottom_h = $slip_ring_small_h + $slip_ring_wire_slack - $h4;
     // height of purple part (added up from top to bottom)
     $purple_h = $purple_bottom_h + $h4 + $h1m3 + ($xbearing_h - $s4);
     
@@ -530,7 +534,7 @@ module stand(dist, shaft_z, y) {
             // holes for mounting on gear
             translate([-mount_x/2+$mount_h+e, 0, 0])
             rotate([0, -90, 0])
-            z_rot_copy(r=$bolt_ygear_r, extra_z=45)
+            z_rot_copy(r=$bolt_ygear_r, offset_deg=45)
             union() {
                 // body of bolt
                 cylinder(d=$m3_body_d+2*$s2, h=2*$mount_h);
@@ -549,7 +553,7 @@ module stand(dist, shaft_z, y) {
             // holes on the idle side to help assembly
             translate([mount_x, 0, 0])
             rotate([0, -90, 0])
-            z_rot_copy(r=$bolt_ygear_r, extra_z=45)
+            z_rot_copy(r=$bolt_ygear_r, offset_deg=45)
             cylinder(d=$m3_head_d+2*$s2, h=mount_x);
 
             // bolts for mounting lidar
@@ -633,7 +637,7 @@ module station_orange(in_place=false) {
     translate([0, 0, in_place_z])
     difference() {
         cylinder(d=$w5, h=$orange_h);
-        cylinder(d=$w3, h=$orange_h);
+        cylinder(d=$w3, h=3*$orange_h, center=true);
         
         // bolt cutouts
         z_rot_copy(r=$bolt_outer_r)
@@ -653,14 +657,11 @@ module station_orange(in_place=false) {
             magnet_slot();
             
             translate([$w5/2, 0, 0])
-            cylinder(d=3, h=2*$orange_h, center=true);
+            cylinder(d=3, h=3*$orange_h, center=true);
         }
     }
 }
 
-// TODO: - holes for mounting slip-ring
-//       - border around slip-ring on the bottom to make sure it
-//         is centered when attaching
 module station_purple(in_place=false) {
     in_place_z = in_place ? -($purple_h + $s4 - $xbearing_h/2) : 0;
     translate([0, 0, in_place_z])
@@ -695,8 +696,21 @@ module station_purple(in_place=false) {
             );
         }
         
+        // assembly hole for slip ring bolts
+        z_rot_copy(r=$slip_ring_hole_r, deg=120)
+        union() {
+            // body of bolt
+            cylinder(d=$m4_head_d+2*$s5, h=2*$green_h);
+          
+        }
+        
         // slip ring
-        cylinder(d=$slip_ring_large_d, h=$purple_h);
+        cylinder(d=$slip_ring_small_d+$s2, h=$purple_h);
+        
+        // conduit
+        rotate([0, 90, 45])
+        cylinder(d=$slip_ring_conduit_d, h=2*$w5);
+        sphere(d=2*$slip_ring_wire_slack);
     }
     
 }
@@ -736,13 +750,17 @@ module station_green(in_place=false) {
         }
         
         // middle bolt cutouts
-        z_rot_copy(r=$bolt_inner_r)
+        translate([0, 0, -e])
+        z_rot_copy(r=$slip_ring_hole_r, deg=120)
         union() {
             // body of bolt
-            cylinder(d=$m3_body_d+$s2, h=2*$green_h);
+            cylinder(d=$m4_body_d+2*$s2, h=2*$green_h);
           
-            // bolt_head pocket
-            cylinder(d=$m3_head_d+2*$s2, h=$green_h+$s4-$bolt_inner_body_len/2);
+            // nut pocket
+            hexagon(
+                ($m4_nut_d+2*$s2)/2,
+                10 // TODO
+            );
         }
         
         // assembly hole for orange bolts
@@ -760,7 +778,7 @@ module station_green(in_place=false) {
         motor_holes();
         
         // slip ring
-        cylinder(d=$slip_ring_small_d, h=$green_h);
+        cylinder(d=$slip_ring_large_d + 2*$s2, h=3*$green_h, center=true);
         
         // leg bolts with nut pocket
         mirror_x()
@@ -796,22 +814,22 @@ module station_blue(in_place=false) {
         }
         
         // bolt cutouts
-        z_rot_copy(r=$bolt_inner_r)
-        union() {
-            // body of bolt
-            cylinder(d=$m3_body_d+$s2, h=$blue_h);
-          
-            // nut pocket
-            hexagon(($m3_nut_d+2*$s2)/2, $blue_h+$s4-($bolt_inner_nut_z-$bolt_inner_body_len/2));
-        }
+        z_rot_copy(r=$slip_ring_hole_r, deg=120)
+        cylinder(d=$m4_body_d+$s2, h=2*$blue_h, center=true);
         
-        // slip ring
-        cylinder(d=$slip_ring_small_d, h=$blue_h);
+        // slip ring plate
+        translate([0, 0, -e])
+        cylinder(d=$slip_ring_plate_d + 2*$s2, h=$slip_ring_plate_h+$s2);
+        
+        // slip ring body
+        cylinder(d=$slip_ring_large_d + 2*$s2, h=3*$blue_h, center=true);
     }
 }
 
 module station_bolts() {
-    // inner
+    
+    
+    // inner TODO: slip ring bolts!!!
     z_rot_copy(r=$bolt_inner_r)
     m3_with_nut(l=$bolt_inner_body_len, nut_z=$bolt_inner_nut_z, center=true);
     
@@ -853,8 +871,9 @@ module station_inside_bearing() {
         }
         
         // bolt supports
-        z_rot_copy(r=$bolt_inner_r)
-        cylinder(d=$h2m3, h=h);
+        d=($w1/2-$slip_ring_hole_r)*2;
+        z_rot_copy(r=$slip_ring_hole_r, deg=120)
+        cylinder(d=d, h=h);
     }
 }
 
@@ -908,14 +927,28 @@ module pcb(in_place=false) {
     cube([$pcb_x, $pcb_y, 10], center=true);
 }
 
-module slip_ring() {
-    cylinder(d=$slip_ring_large_d, h=$slip_ring_large_h);
+module slip_ring(in_place=false) {
+    in_place_mirror = in_place ? [0, 0, 1] : [0, 0, 0];
+    in_place_z = in_place ? $slip_ring_large_h + $slip_ring_plate_h - $blue_h - $s4 : 0;
     
-    translate([0, 0, $slip_ring_large_h])
-    cylinder(d=$slip_ring_plate_d, h=$slip_ring_plate_h);
+    translate([0, 0, in_place_z])
+    mirror(in_place_mirror)
+    union() {
     
-    translate([0, 0, $slip_ring_large_h+$slip_ring_plate_h])
-    cylinder(d=$slip_ring_small_d, h=$slip_ring_small_h);
+        cylinder(d=$slip_ring_large_d, h=$slip_ring_large_h);
+        
+        translate([0, 0, $slip_ring_large_h])
+        difference() {
+            cylinder(d=$slip_ring_plate_d, h=$slip_ring_plate_h);
+            
+            z_rot_copy(deg=120)
+            translate([$slip_ring_hole_r, 0, 0])
+            cylinder(d=$slip_ring_hole_d, h=3*$slip_ring_plate_h, center=true);
+        }
+        
+        translate([0, 0, $slip_ring_large_h+$slip_ring_plate_h])
+        cylinder(d=$slip_ring_small_d, h=$slip_ring_small_h);
+    }
 }
 
 module motor() {
@@ -926,7 +959,6 @@ module motor() {
 }
 
 module lidar() {
-    $fn=30;
     base_x=48;
     base_y=20;
     base_z=14.6;
@@ -987,7 +1019,6 @@ module gear(tooth_number=50, width=10, bore=10, optimized=false) {
 }
 
 module ybearing_plug_m3() {
-    $fn=50;
     difference() {
         cylinder(d=5.8, h=9.8);
         cylinder(d=3.4, h=100, center=true);
@@ -1003,7 +1034,6 @@ module ybearing_plug_m4() {
 }
 
 module plug(h=$ybearing_h, gap=$s5) {
-    $fn=50;
     ledge=($ybearing_outer_d-$ybearing_inner_d)/2/3;
     
     translate([0, 0, -h/2-gap])
@@ -1017,8 +1047,6 @@ module plug(h=$ybearing_h, gap=$s5) {
 }
 
 module driver_gear(tooth_number=25, nut_h = 2.5, nut_w=5.6, h=16, inverted=true) {
-    $fn=50;
-    
     invert_rotation = inverted ? 180 : 0;
     
 //    render(convexity = 2)
@@ -1059,8 +1087,6 @@ module m3_side_pocket(nut_h = 2.5, nut_w=5.6, center=false) {
 }
 
 module motor_holes() {
-    $fn=30;
-    
     mirror_x()
     mirror_y()
     translate([-31/2, -31/2, 0])
