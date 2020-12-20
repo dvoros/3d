@@ -241,12 +241,13 @@ module superhack() {
         union() {
             translate([0, -$slip_ring_plate_d/2, x/2])
             cube([72, 20, x], center=true);
+            translate([5, 0, 0])
             cube([$slip_ring_plate_d, $slip_ring_plate_d, 2*x], center=true);
         }
         
         z_rot_copy(r=$slip_ring_hole_r, deg=120) {
             cylinder(d=$m4_body_d+2*$s2, h=100, center=true);
-            cylinder(d=$m4_head_d*3, h=100);
+            cylinder(d=13, h=100);
         }
     }
 }
