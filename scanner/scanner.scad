@@ -33,6 +33,7 @@ $fn=100;
 //
 ////    xbearing();
 //    
+//    // TODO: fix bolts
 ////    station_bolts();
 //    
 ////    color("cyan") pcb(in_place=true);
@@ -41,11 +42,11 @@ $fn=100;
 //};
 
 
-maxi_station()
+//maxi_station()
 //station_purple();
 //station_green();
 //station_orange();
-station_blue();
+//station_blue();
 
 
 //maxi_station() {
@@ -62,8 +63,9 @@ station_blue();
 //    mini_stand();
 //}
 
-//maxi_station()
+maxi_station()
 //mini_stand();
+superhack();
 
 
 //ygear_plug_m4();
@@ -75,36 +77,6 @@ station_blue();
 
 
 
-module hall_hole() {
-    h=$h1m3;
-    hall_d=4.4;
-    hall_l=4;
-    
-    hole_l=10;
-    entrance_deg=80;
-    
-
-   translate([0, 0, 0.4 + hall_d/2-e])
-    union() {
-        translate([0, 0, -0.4/2])
-        cube([hall_d, hall_d, hall_d+0.4], center=true);
-        
-        rotate([0, 90, 0])
-        translate([-hall_d/2, -hall_d/2, 0])
-        cube([hall_d, hall_d, hole_l]);
-        
-        x=cos(entrance_deg)*hall_d;
-        y=sin(entrance_deg)*hall_d;
-        translate([hole_l-x/2, 0, -(hall_d-y)/2])
-        rotate([0, entrance_deg, 0])
-        translate([-hall_d/2, -hall_d/2, 0])
-        cube([hall_d, hall_d, 30]);
-    }
-}
-
-module magnet_slot() {
-    cylinder(d=$magnet_d+$s2, h=$magnet_h+$s1);
-}
 
 
 module maxi_station() {
@@ -261,6 +233,53 @@ module maxi_station() {
     
     
     children();
+}
+
+module superhack() {
+    x=7.5;
+    difference() {
+        union() {
+            translate([0, -$slip_ring_plate_d/2, x/2])
+            cube([72, 20, x], center=true);
+            cube([$slip_ring_plate_d, $slip_ring_plate_d, 2*x], center=true);
+        }
+        
+        z_rot_copy(r=$slip_ring_hole_r, deg=120) {
+            cylinder(d=$m4_body_d+2*$s2, h=100, center=true);
+            cylinder(d=$m4_head_d*3, h=100);
+        }
+    }
+}
+
+module hall_hole() {
+    h=$h1m3;
+    hall_d=4.4;
+    hall_l=4;
+    
+    hole_l=10;
+    entrance_deg=80;
+    
+
+   translate([0, 0, 0.4 + hall_d/2-e])
+    union() {
+        translate([0, 0, -0.4/2])
+        cube([hall_d, hall_d, hall_d+0.4], center=true);
+        
+        rotate([0, 90, 0])
+        translate([-hall_d/2, -hall_d/2, 0])
+        cube([hall_d, hall_d, hole_l]);
+        
+        x=cos(entrance_deg)*hall_d;
+        y=sin(entrance_deg)*hall_d;
+        translate([hole_l-x/2, 0, -(hall_d-y)/2])
+        rotate([0, entrance_deg, 0])
+        translate([-hall_d/2, -hall_d/2, 0])
+        cube([hall_d, hall_d, 30]);
+    }
+}
+
+module magnet_slot() {
+    cylinder(d=$magnet_d+$s2, h=$magnet_h+$s1);
 }
 
 module y_gear() {
