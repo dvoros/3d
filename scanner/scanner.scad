@@ -4,7 +4,7 @@ use <../lib/mylib.scad>;
 e=0.01;
 color_orange=[255/255, 165/255, 0/255];
 
-$fn=100;
+$fn=30;
 
 //gear();
 //platform(75/2);
@@ -17,29 +17,32 @@ $fn=100;
 //maxi_station()
 //slip_ring();
 
-//cut_x()
-//maxi_station() {
-//    color("blue")
-//    station_blue(in_place=true);
-//    
-//    color("green")
-//    station_green(in_place=true);
-//    
-//    color("purple")
-//    station_purple(in_place=true);
-//    
-//    color(color_orange)
-//    station_orange(true);
-//
-////    xbearing();
-//    
-//    // TODO: fix bolts
-////    station_bolts();
-//    
-////    color("cyan") pcb(in_place=true);
-//    
-//    %slip_ring(in_place=true);
-//};
+cut_x()
+maxi_station() {
+    color("blue")
+    station_blue(in_place=true);
+    
+    color("green")
+    station_green(in_place=true);
+    
+    color("purple")
+    station_purple(in_place=true);
+    
+    color(color_orange)
+    station_orange(true);
+
+    %cut_x()
+    xbearing();
+    
+    // TODO: fix bolts
+    station_bolts();
+    
+    %cut_x()
+    pcb(in_place=true);
+    
+    %cut_x()
+    slip_ring(in_place=true);
+};
 
 
 //maxi_station()
@@ -63,9 +66,9 @@ $fn=100;
 //    mini_stand();
 //}
 
-maxi_station()
+//maxi_station()
 //mini_stand();
-superhack();
+//superhack();
 
 
 //ygear_plug_m4();
@@ -77,20 +80,22 @@ superhack();
 
 
 
-
-
 module maxi_station() {
+    // Parameters of bearing responsible for horizontal rotation of the plate
     $xbearing_inner_d = 50;
     $xbearing_outer_d = 72;
     $xbearing_h = 12;
     
+    // Parameters of bearing responsible for vertical rotation of the LIDAR mount
     $ybearing_inner_d = 6;
     $ybearing_outer_d = 13;
     $ybearing_h = 5;
     
+    // Tooth numbers for the horizontal gears
     $base_tooth_num = 100;
     $xdriver_tooth_num = 25;
     
+    // Tooth numbers for the vertical gears
     $stand_tooth_num = 60;
     $ydriver_tooth_num = 20;
     
@@ -108,6 +113,10 @@ module maxi_station() {
     
     $pcb_x = 72;
     $pcb_y = 72;
+    $pcb_hole_dist = 65;
+    $pcb_hole_offset_x = 4.2; // distance of top-left hole (center) from the left
+    $pcb_hole_offset_y = 3.5; // distance of top-left hole (center) from the top
+    
     
     $magnet_d=3;
     $magnet_h=1.7;
@@ -132,6 +141,17 @@ module maxi_station() {
     $lidar_bolts_y=27.4;
     
     
+    // M2 nut+bolt parameters
+    // All these need at least a tight fit slack (0.2)
+    // on their diameter to make a socket
+    $m2_body_d = 2.0;
+    $m2_head_d = 4;
+    $m2_head_h = 1.8;
+    $m2_nut_square = 4;
+    $m2_nut_d = 4.6; // ~= $m2_nut_square / cos(30)
+    $m2_nut_h = 1.5;
+    $m2_body_after_nut_safety = $m2_nut_h + 2.0;
+    
     // M3 nut+bolt parameters
     // All these need at least a tight fit slack (0.2)
     // on their diameter to make a socket
@@ -139,7 +159,7 @@ module maxi_station() {
     $m3_head_d = 5.8;
     $m3_head_h = 2.4;
     $m3_nut_square = 5.4;
-    $m3_nut_d = 6.2;
+    $m3_nut_d = 6.2; // ~= $m3_nut_square / cos(30)
     $m3_nut_h = 2.3;
     $m3_body_after_nut_safety = $m3_nut_h + 2.0;
     
@@ -150,12 +170,12 @@ module maxi_station() {
     $m4_head_d = 8.0;
     $m4_head_h = 3.2;
     $m4_nut_square = 6.8;
-    $m4_nut_d = 7.8;
+    $m4_nut_d = 7.8; // ~= $m4_nut_square / cos(30)
     $m4_nut_h = 3.0;
     $m4_body_after_nut_safety = $m4_nut_h + 2.0;
     
     // Bolt length
-    $bolt_inner_body_len = 20;
+    $bolt_inner_body_len = 25;
     $bolt_outer_body_len = 35;
     
     
@@ -208,7 +228,7 @@ module maxi_station() {
     $bolt_outer_r = $w5/2 - $h2m4/2;
     
     // Desired distrance of nuts from the heads
-    $bolt_inner_nut_z = $bolt_inner_body_len - $m3_body_after_nut_safety;
+    $bolt_inner_nut_z = $bolt_inner_body_len - $m4_body_after_nut_safety;
     $bolt_outer_nut_z = $bolt_outer_body_len - $m4_body_after_nut_safety;
     
     // Middle of bearing is positioned in the center
@@ -779,7 +799,7 @@ module station_green(in_place=false) {
             // nut pocket
             hexagon(
                 ($m4_nut_d+2*$s2)/2,
-                10 // TODO
+                $green_h + $s4 - ($bolt_inner_nut_z - ($blue_h + $s4))
             );
         }
         
@@ -815,8 +835,8 @@ module station_green(in_place=false) {
             );
         }
         
-//        translate([$leg_wall_d, $leg_wall_d/2, leg_bottom_width/2])
-//        cylinder(d=$m4_head_d+2*$s2, h=leg_bottom_width);
+        // pcb bolts with nut pocket
+        pcb_holes();
     }
 }
 
@@ -835,7 +855,7 @@ module station_blue(in_place=false) {
         
         // bolt cutouts
         z_rot_copy(r=$slip_ring_hole_r, deg=120)
-        cylinder(d=$m4_body_d+$s2, h=2*$blue_h, center=true);
+        cylinder(d=$m4_body_d+2*$s2, h=2*$blue_h, center=true);
         
         // slip ring plate
         translate([0, 0, -e])
@@ -847,11 +867,12 @@ module station_blue(in_place=false) {
 }
 
 module station_bolts() {
-    
-    
     // inner TODO: slip ring bolts!!!
-    z_rot_copy(r=$bolt_inner_r)
-    m3_with_nut(l=$bolt_inner_body_len, nut_z=$bolt_inner_nut_z, center=true);
+    z_rot_copy(r=$slip_ring_hole_r, deg=120)
+//    translate([0, 0, $blue_h+$s4])
+    translate([0, 0, $bolt_inner_body_len - $blue_h - $s4])
+    rotate([180, 0, 0])
+    m4_with_nut(l=$bolt_inner_body_len, nut_z=$bolt_inner_nut_z, center=false);
     
     // outer
     translate([0, 0, -$bolt_outer_body_len+$xbearing_h/2+$orange_h/2])
@@ -1121,4 +1142,29 @@ module motor_holes() {
         circle(d=24);
     }
     
+}
+
+module pcb_holes(nut_slack=$s3) {
+    offset_by_default_x = ($pcb_x - $pcb_hole_dist) / 2;
+    offset_by_default_y = ($pcb_y - $pcb_hole_dist) / 2;
+    
+    translate([$pcb_hole_offset_x-offset_by_default_x, $pcb_hole_offset_y-offset_by_default_y, 0])
+    mirror_x()
+    mirror_y()
+    translate([$pcb_hole_dist/2, $pcb_hole_dist/2, 0])
+    pcb_hole(nut_slack=nut_slack);
+}
+
+module pcb_hole(nut_slack=$s3) {
+    union() {
+        // body of bolt
+        cylinder(d=$m2_body_d + 2*$s2, h=$green_h*3, center=true);
+        
+        // nut pocket
+        translate([0, 0, $m2_nut_h])
+        hexagon(
+            ($m2_nut_d+nut_slack)/2,
+            $green_h
+        );
+    }
 }
