@@ -28,6 +28,9 @@ maxi_station() {
     color("purple")
     station_purple(in_place=true);
     
+    color("pink")
+    station_pink(in_place=true);
+    
     color(color_orange)
     station_orange(true);
 
@@ -43,9 +46,9 @@ maxi_station() {
     %cut_x()
     slip_ring(in_place=true);
 };
-maxi_station()
-color("yellow")
-voltage_plug();
+//maxi_station()
+//color("yellow")
+//voltage_plug();
 
 
 
@@ -254,10 +257,14 @@ module maxi_station() {
     // height of blue part (added up from top to bottom)
     $blue_h = ($xbearing_h/2 - $s4) + $h1m3;
     
-    $purple_bottom_h = $slip_ring_small_h + $slip_ring_wire_slack - $h4;
     // height of purple part (added up from top to bottom)
-    $purple_h = $purple_bottom_h + $h4 + $h1m3 + ($xbearing_h - $s4);
+    $purple_h = $slip_ring_small_h + $slip_ring_wire_slack - $h4;
     
+    // height of pink part (added up from top to bottom)
+    $pink_h = $h4 + $h1m3 + ($xbearing_h - $s4);
+    
+    // the very bottom when everything's in place
+    $bottom_z = -($purple_h+$pink_h + $s4 - $xbearing_h/2);
     
     
     children();
@@ -693,17 +700,41 @@ module station_orange(in_place=false) {
     }
 }
 
-module station_purple(in_place=false) {
-    in_place_z = in_place ? -($purple_h + $s4 - $xbearing_h/2) : 0;
+module station_pink(in_place=false) {
+    base_h= $h4 + $h1m3 + ($xbearing_h-$gear_h) - $s4;
+    pink_h = base_h + $gear_h;
+    
+    in_place_z = in_place ? $bottom_z + $purple_h : 0;
+    
     translate([0, 0, in_place_z])
     difference() {
         union() {
-            base_h= $purple_bottom_h + $h4 + $h1m3 + ($xbearing_h-$gear_h) - $s4;
-            
             cylinder(d=$w5, h=base_h);
             
             translate([0, 0, base_h])
             gear(tooth_number=$base_tooth_num, width=$gear_h, bore=0);
+        }
+        
+        // smaller dia, under bearing
+        cylinder(d=$w3, h=3*pink_h, center=true);
+        
+        // larger dia, around bearing
+        translate([0, 0, $h4+$h1m3])
+        cylinder(d=$w4, h=$pink_h);
+        
+        // bolt cutouts
+        z_rot_copy(r=$bolt_outer_r)
+        cylinder(d=$m4_body_d+2*$s2, h=3*pink_h, center=true);
+    }
+}
+
+module station_purple(in_place=false) {
+    in_place_z = in_place ? $bottom_z : 0;
+    
+    translate([0, 0, in_place_z])
+    difference() {
+        union() {
+            cylinder(d=$w5, h=$purple_h);
             
             // mounting holes on the bottom
             difference() {
@@ -723,29 +754,12 @@ module station_purple(in_place=false) {
             }
         }
         
-        // smaller dia, under bearing
-        translate([0, 0, $purple_bottom_h])
-        cylinder(d=$w3, h=$purple_h);
-        
-        // larger dia, around bearing
-        translate([0, 0, $purple_bottom_h+$h4+$h1m3])
-        cylinder(d=$w4, h=$purple_h);
-        
         // bolt cutouts
         z_rot_copy(r=$bolt_outer_r)
-        union() {
-            // body of bolt
-            cylinder(d=$m4_body_d+2*$s2, h=2*$purple_h);
-          
-            // nut pocket
-            hexagon(
-                ($m4_nut_d+2*$s2)/2,
-                $purple_h - ($bolt_outer_nut_z - ($orange_h/2 + $s4))
-            );
-        }
+        m4_nut_pocket(z=$purple_h + $pink_h - ($bolt_outer_nut_z - ($orange_h/2 + $s4)));
         
         // assembly hole for slip ring bolts
-        z_rot_copy(r=$slip_ring_hole_r, deg=120)
+        translate([$slip_ring_hole_r, 0, 0])
         cylinder(d=$m4_head_d+2*$s5, h=2*$green_h, center=true);
         
         // slip ring
@@ -896,6 +910,19 @@ module m4_head_pocket(z=$h1m4-$m4_head_h-$s2) {
     union() {
         cylinder(d=$m4_body_d+2*$s2, h=1000, center=true);
         cylinder(d=$m4_head_d+2*$s2, h=500);
+    }
+}
+
+module m4_nut_pocket(z=0) {
+    translate([0, 0, z])
+    union() {
+        cylinder(d=$m4_body_d+2*$s2, h=1000, center=true);
+        
+        translate([0, 0, -500])
+        hexagon(
+            ($m4_nut_d+2*$s2)/2,
+            500
+        );
     }
 }
 
@@ -1197,7 +1224,7 @@ module voltage_plug() {
     leg_offset = 1; // from the sides of the PCB
     leg_z = 4.5 + 2*$s3;
     
-    translate([0, 0, -$purple_h + 12])
+//    translate([0, 0, -$purple_h + 12])
     rotate([0, 0, 135])
     union() {
         translate([-$plug_pcb_x/2 - 2*$h3 + $w5/2 , 0, 0])
