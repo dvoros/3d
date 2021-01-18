@@ -43,6 +43,10 @@ maxi_station() {
     %cut_x()
     slip_ring(in_place=true);
 };
+maxi_station()
+color("yellow")
+voltage_plug();
+
 
 
 //maxi_station()
@@ -111,11 +115,15 @@ module maxi_station() {
     
     $leg_wall_d = 15;
     
-    $pcb_x = 72;
-    $pcb_y = 72;
-    $pcb_hole_dist = 65;
-    $pcb_hole_offset_x = 4.2; // distance of top-left hole (center) from the left
-    $pcb_hole_offset_y = 3.5; // distance of top-left hole (center) from the top
+    $main_pcb_x = 72;
+    $main_pcb_y = 72;
+    $main_pcb_hole_dist = 65;
+    $main_pcb_hole_offset_x = 4.2; // distance of top-left hole (center) from the left
+    $main_pcb_hole_offset_y = 3.5; // distance of top-left hole (center) from the top
+    
+    $plug_pcb_x = 23;
+    $plug_pcb_y = 11;
+    
     
     
     $magnet_d=3;
@@ -134,7 +142,7 @@ module maxi_station() {
     $slip_ring_large_h = 28-$slip_ring_plate_h;
     $slip_ring_hole_r = $slip_ring_plate_d/2-4.2; // radius of the circle that the holes lie on
     $slip_ring_hole_d = 5.5; // diameter of holes
-    $slip_ring_wire_slack = 8; // necessary distance for wires to bend
+    $slip_ring_wire_slack = 10; // necessary distance for wires to bend
     $slip_ring_conduit_d = 8;
     
     $lidar_bolts_x=28.6;
@@ -327,7 +335,7 @@ module mini_stand() {
     
 //    translate([0, 0, $plate_z+h])
     stand(
-        dist=$pcb_x+4*$s5,
+        dist=$main_pcb_x+4*$s5,
         shaft_z=h,
         y=30
     );
@@ -423,7 +431,7 @@ module stand(dist, shaft_z, y) {
         
         
         // bottom
-        translate([-$pcb_x/2-$leg_pcb_gap, 0, 0])
+        translate([-$main_pcb_x/2-$leg_pcb_gap, 0, 0])
         difference() {
             union() {
                 // base
@@ -486,7 +494,7 @@ module stand(dist, shaft_z, y) {
     module idle_leg() {
         h=shaft_z+$h2m4/2;
         
-        translate([$pcb_x/2+$leg_pcb_gap, 0, leg_bottom_width])
+        translate([$main_pcb_x/2+$leg_pcb_gap, 0, leg_bottom_width])
         rotate([90, 0, 90])
         difference() {
             linear_extrude(height=$h1m3)
@@ -531,7 +539,7 @@ module stand(dist, shaft_z, y) {
         
         // bottom
         mirror_y()
-        translate([$pcb_x/2+$leg_pcb_gap, $motor_w/2+$s5])
+        translate([$main_pcb_x/2+$leg_pcb_gap, $motor_w/2+$s5])
         difference() {
             linear_extrude(height=leg_bottom_width)
             leg_zprojection();
@@ -541,13 +549,8 @@ module stand(dist, shaft_z, y) {
     }
     
     module leg_bottom_sockets() {
-        // bolt
-        translate([$leg_wall_d, $leg_wall_d/2, -leg_bottom_width])
-        cylinder(d=$m4_body_d+2*$s2, h=3*leg_bottom_width);
-        
-        // bolt head pocket
-        translate([$leg_wall_d, $leg_wall_d/2, leg_bottom_width/2])
-        cylinder(d=$m4_head_d+2*$s2, h=leg_bottom_width);
+        translate([$leg_wall_d, $leg_wall_d/2, 0])
+        m4_head_pocket();
     }
     
     module mount() {
@@ -575,13 +578,8 @@ module stand(dist, shaft_z, y) {
             translate([-mount_x/2+$mount_h+e, 0, 0])
             rotate([0, -90, 0])
             z_rot_copy(r=$bolt_ygear_r, offset_deg=45)
-            union() {
-                // body of bolt
-                cylinder(d=$m3_body_d+2*$s2, h=2*$mount_h);
-              
-                // bolt_head pocket
-                cylinder(d=$m3_head_d+2*$s2, h=$mount_h/2);
-            }
+            mirror([0, 0, 1])
+            m3_head_pocket(z=-$mount_h/2)
             
             // hole for bolt on idle and gear side
             translate([mount_x/2-$mount_h, 0, 0])
@@ -594,7 +592,7 @@ module stand(dist, shaft_z, y) {
             translate([mount_x, 0, 0])
             rotate([0, -90, 0])
             z_rot_copy(r=$bolt_ygear_r, offset_deg=45)
-            cylinder(d=$m3_head_d+2*$s2, h=mount_x);
+            cylinder(d=$m4_head_d+2*$s2, h=mount_x);
 
             // bolts for mounting lidar
             mirror_x()
@@ -664,7 +662,7 @@ module stand1(in_place=false) {
     
 //    mirror_x()
     mirror_y()
-    #translate([$pcb_x/2+$s5, $motor_w/2+$s5])
+    #translate([$main_pcb_x/2+$s5, $motor_w/2+$s5])
     hull() {
         translate([$leg_wall_d, $leg_wall_d/2, 0])
         circle(d=$leg_wall_d);
@@ -681,14 +679,7 @@ module station_orange(in_place=false) {
         
         // bolt cutouts
         z_rot_copy(r=$bolt_outer_r)
-        union() {
-            // body of bolt
-            cylinder(d=$m4_body_d+$s2, h=$orange_h);
-          
-            // bolt_head pocket
-            translate([0, 0, $orange_h/2])
-            cylinder(d=$m4_head_d+2*$s2, h=$orange_h);
-        }
+        m4_head_pocket(z=$orange_h/2);
         
         // magnet slot and notch
         rotate([0, 0, 45]) {
@@ -713,6 +704,23 @@ module station_purple(in_place=false) {
             
             translate([0, 0, base_h])
             gear(tooth_number=$base_tooth_num, width=$gear_h, bore=0);
+            
+            // mounting holes on the bottom
+            difference() {
+                h=$h1m4;
+                r=$w5/2 + $h2m4/2;
+                linear_extrude(height=h)
+                rotz()
+                difference() {
+                    hull()
+                    mirror_y()
+                    translate([0, r])
+                    circle(d=$h2m4);
+                }
+                
+                z_rot_copy(r=r, deg=90)
+                m4_head_pocket();
+            }
         }
         
         // smaller dia, under bearing
@@ -727,7 +735,7 @@ module station_purple(in_place=false) {
         z_rot_copy(r=$bolt_outer_r)
         union() {
             // body of bolt
-            cylinder(d=$m4_body_d+$s2, h=2*$purple_h);
+            cylinder(d=$m4_body_d+2*$s2, h=2*$purple_h);
           
             // nut pocket
             hexagon(
@@ -738,11 +746,7 @@ module station_purple(in_place=false) {
         
         // assembly hole for slip ring bolts
         z_rot_copy(r=$slip_ring_hole_r, deg=120)
-        union() {
-            // body of bolt
-            cylinder(d=$m4_head_d+2*$s5, h=2*$green_h);
-          
-        }
+        cylinder(d=$m4_head_d+2*$s5, h=2*$green_h, center=true);
         
         // slip ring
         cylinder(d=$slip_ring_small_d+$s2, h=$purple_h);
@@ -752,7 +756,6 @@ module station_purple(in_place=false) {
         cylinder(d=$slip_ring_conduit_d, h=2*$w5);
         sphere(d=2*$slip_ring_wire_slack);
     }
-    
 }
 
 // plate
@@ -776,7 +779,7 @@ module station_green(in_place=false) {
                 // legs
                 mirror_x()
                 mirror_y()
-                translate([$pcb_x/2+$leg_pcb_gap, $motor_w/2+$s5])
+                translate([$main_pcb_x/2+$leg_pcb_gap, $motor_w/2+$s5])
                 leg_zprojection();
             }
             
@@ -805,7 +808,7 @@ module station_green(in_place=false) {
         
         // assembly hole for orange bolts
         translate([0, $bolt_outer_r, -e])
-        cylinder(d=$m4_head_d+$s2, h=2*$green_h);
+        cylinder(d=$m4_head_d+2*$s2, h=2*$green_h);
         
         // hall sensor
         translate([0, -$bolt_outer_r, $plate_h])
@@ -823,7 +826,7 @@ module station_green(in_place=false) {
         // leg bolts with nut pocket
         mirror_x()
         mirror_y()
-        translate([$pcb_x/2+$leg_pcb_gap, $motor_w/2+$s5])
+        translate([$main_pcb_x/2+$leg_pcb_gap, $motor_w/2+$s5])
         translate([$leg_wall_d, $leg_wall_d/2, 0])
         union() {
             cylinder(d=$m4_body_d+2*$s2, h=3*$h1m3, center=true);
@@ -878,6 +881,22 @@ module station_bolts() {
     translate([0, 0, -$bolt_outer_body_len+$xbearing_h/2+$orange_h/2])
     z_rot_copy(r=$bolt_outer_r)
     m4_with_nut(l=$bolt_outer_body_len, nut_z=$bolt_outer_nut_z, center=false);
+}
+
+module m3_head_pocket(z=$h1m3-$m3_head_h-$s2) {
+    translate([0, 0, z])
+    union() {
+        cylinder(d=$m3_body_d+2*$s2, h=1000, center=true);
+        cylinder(d=$m3_head_d+2*$s2, h=500);
+    }
+}
+
+module m4_head_pocket(z=$h1m4-$m4_head_h-$s2) {
+    translate([0, 0, z])
+    union() {
+        cylinder(d=$m4_body_d+2*$s2, h=1000, center=true);
+        cylinder(d=$m4_head_d+2*$s2, h=500);
+    }
 }
 
 module xbearing() {
@@ -965,7 +984,7 @@ module m4_with_nut(l, nut_z, center=true) {
 module pcb(in_place=false) {
     in_place_z = in_place ? $plate_z : 0;
     translate([0, 0, 5 + in_place_z])
-    cube([$pcb_x, $pcb_y, 10], center=true);
+    cube([$main_pcb_x, $main_pcb_y, 10], center=true);
 }
 
 module slip_ring(in_place=false) {
@@ -1145,13 +1164,13 @@ module motor_holes() {
 }
 
 module pcb_holes(nut_slack=$s3) {
-    offset_by_default_x = ($pcb_x - $pcb_hole_dist) / 2;
-    offset_by_default_y = ($pcb_y - $pcb_hole_dist) / 2;
+    offset_by_default_x = ($main_pcb_x - $main_pcb_hole_dist) / 2;
+    offset_by_default_y = ($main_pcb_y - $main_pcb_hole_dist) / 2;
     
-    translate([$pcb_hole_offset_x-offset_by_default_x, $pcb_hole_offset_y-offset_by_default_y, 0])
+    translate([$main_pcb_hole_offset_x-offset_by_default_x, $main_pcb_hole_offset_y-offset_by_default_y, 0])
     mirror_x()
     mirror_y()
-    translate([$pcb_hole_dist/2, $pcb_hole_dist/2, 0])
+    translate([$main_pcb_hole_dist/2, $main_pcb_hole_dist/2, 0])
     pcb_hole(nut_slack=nut_slack);
 }
 
@@ -1166,5 +1185,36 @@ module pcb_hole(nut_slack=$s3) {
             ($m2_nut_d+nut_slack)/2,
             $green_h
         );
+    }
+}
+
+module voltage_plug() {
+    pcb_z = 1.6 + 2*$s3;
+    plug_z = 10.9 + 2*$s3;
+    plug_y = 10 + 2*$s3;
+//    plug_x = 25.1 + 2*$s3;
+    plug_dist = 3.7; // from the back of the PCB
+    leg_offset = 1; // from the sides of the PCB
+    leg_z = 4.5 + 2*$s3;
+    
+    translate([0, 0, -$purple_h + 12])
+    rotate([0, 0, 135])
+    union() {
+        translate([-$plug_pcb_x/2 - 2*$h3 + $w5/2 , 0, 0])
+        {
+            // PCB
+            translate([0, 0, -pcb_z/2])
+            cube([$plug_pcb_x, $plug_pcb_y, pcb_z], center=true);
+            
+            
+            // Legs
+            translate([0, 0, -leg_z/2])
+            cube([$plug_pcb_x-2*leg_offset, $plug_pcb_y-2*leg_offset, leg_z], center=true);
+        }
+        
+        
+        // Plug
+        translate([0, -plug_y/2, 0])
+        cube([$w5, plug_y, plug_z]);
     }
 }

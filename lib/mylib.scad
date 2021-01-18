@@ -1,7 +1,7 @@
-module rotz() {
+module rotz(deg=90) {
     children();
     
-    rotate([0, 0, 90])
+    rotate([0, 0, deg])
     children();
 }
 
