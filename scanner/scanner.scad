@@ -6,6 +6,12 @@ color_orange=[255/255, 165/255, 0/255];
 
 $fn=30;
 
+// TODO:
+// - same words used with multiple meaning:
+//    - leg
+//    - plug
+// - gradle build
+
 //gear();
 //platform(75/2);
 //motor_platform(75/2);
@@ -48,11 +54,12 @@ maxi_station() {
 };
 //maxi_station()
 //color("yellow")
-//voltage_plug();
+//voltage_plug(in_place=true);
 
 
 
 //maxi_station()
+//station_pink();
 //station_purple();
 //station_green();
 //station_orange();
@@ -88,6 +95,23 @@ maxi_station() {
 
 
 module maxi_station() {
+    //
+    // Slacks
+    //
+    
+    // "no slack"
+    $s0 = 0;
+    // very tight fit
+    $s1 = 0.15;
+    // easy fit
+    $s2 = 0.3;
+    // tight fit
+    $s3 = 0.2;
+    // needs to be pulled together with a bolt to get a tight fit
+    $s4 = 0.4;
+    // can't touch
+    $s5 = 0.8;
+    
     // Parameters of bearing responsible for horizontal rotation of the plate
     $xbearing_inner_d = 50;
     $xbearing_outer_d = 72;
@@ -127,8 +151,6 @@ module maxi_station() {
     $plug_pcb_x = 23;
     $plug_pcb_y = 11;
     
-    
-    
     $magnet_d=3;
     $magnet_h=1.7;
     
@@ -150,7 +172,6 @@ module maxi_station() {
     
     $lidar_bolts_x=28.6;
     $lidar_bolts_y=27.4;
-    
     
     // M2 nut+bolt parameters
     // All these need at least a tight fit slack (0.2)
@@ -185,24 +206,20 @@ module maxi_station() {
     $m4_nut_h = 3.0;
     $m4_body_after_nut_safety = $m4_nut_h + 2.0;
     
-    // Bolt length
+    // Bolt lengths
     $bolt_inner_body_len = 25;
-    $bolt_outer_body_len = 35;
+    $bolt_outer_body_len = 40;
     
-    
-    // "no slack"
-    $s0 = 0;
-    // very tight fit
-    $s1 = 0.15;
-    // easy fit
-    $s2 = 0.3;
-    // tight fit
-    $s3 = 0.2;
-    // needs to be pulled together with a bolt to get a tight fit
-    $s4 = 0.4;
-    // can't touch
-    $s5 = 0.8;
-    
+    //
+    // Voltage source PCB parameters
+    //
+    $plug_pcb_pcb_z = 1.6 + 2*$s3;
+    $plug_pcb_plug_z = 10.9 + 2*$s3;
+    $plug_pcb_plug_y = 10 + 2*$s3;
+    $plug_pcb_plug_dist = 3.7; // from the back of the PCB
+    $plug_pcb_leg_offset = 1; // from the sides of the PCB
+    $plug_pcb_leg_z = 4.5 + 2*$s3;
+    $plug_pcb_h = $plug_pcb_leg_z + $plug_pcb_plug_z;
     
     // REST IS CALCULATED, DO NOT EDIT!
     
@@ -214,6 +231,7 @@ module maxi_station() {
     $h2m4 = ($m4_nut_d + $s3) * 2; echo($h2m4=$h2m4);
     // rigid wall width
     $h3 = 0.8;
+    // place for an M4 head that can't touch the ceiling
     $h4 = $m4_head_h + 2*$s5;
     
     $w1 = $xbearing_inner_d - $s2;
@@ -232,7 +250,7 @@ module maxi_station() {
     $ymotor_z = ($stand_tooth_num+$ydriver_tooth_num)/2;
     
     // TODO: re-enable!!!
-//    assert($w5 >= $w5_min, "teeth number is too small to fit");
+//    assert($w5 >= $w5_min, str("teeth number is too small to fit (",$w5,"<",$w5_min,")"));
     
     // Radius of cirlce on which to place the bolts on
     $bolt_inner_r = $w1/2 - $h2m3/2;
@@ -258,10 +276,12 @@ module maxi_station() {
     $blue_h = ($xbearing_h/2 - $s4) + $h1m3;
     
     // height of purple part (added up from top to bottom)
-    $purple_h = $slip_ring_small_h + $slip_ring_wire_slack - $h4;
+    $purple_h_min = $slip_ring_small_h + $slip_ring_wire_slack - $h4;
+    
+    $purple_h = 2*$h3 + $plug_pcb_h;
     
     // height of pink part (added up from top to bottom)
-    $pink_h = $h4 + $h1m3 + ($xbearing_h - $s4);
+    $pink_h = ($xbearing_h - $s4) + $h4 + $h1m3;
     
     // the very bottom when everything's in place
     $bottom_z = -($purple_h+$pink_h + $s4 - $xbearing_h/2);
@@ -760,15 +780,18 @@ module station_purple(in_place=false) {
         
         // assembly hole for slip ring bolts
         translate([$slip_ring_hole_r, 0, 0])
-        cylinder(d=$m4_head_d+2*$s5, h=2*$green_h, center=true);
+        cylinder(d=$m4_head_d+2*$s5, h=3*$purple_h, center=true);
         
         // slip ring
-        cylinder(d=$slip_ring_small_d+$s2, h=$purple_h);
+        cylinder(d=$slip_ring_small_d+$s2, h=3*$purple_h, center=true);
         
         // conduit
         rotate([0, 90, 45])
         cylinder(d=$slip_ring_conduit_d, h=2*$w5);
         sphere(d=2*$slip_ring_wire_slack);
+        
+        // voltage plug
+        voltage_plug(in_place=true);
     }
 }
 
@@ -1215,33 +1238,29 @@ module pcb_hole(nut_slack=$s3) {
     }
 }
 
-module voltage_plug() {
-    pcb_z = 1.6 + 2*$s3;
-    plug_z = 10.9 + 2*$s3;
-    plug_y = 10 + 2*$s3;
-//    plug_x = 25.1 + 2*$s3;
-    plug_dist = 3.7; // from the back of the PCB
-    leg_offset = 1; // from the sides of the PCB
-    leg_z = 4.5 + 2*$s3;
+module voltage_plug(in_place=false) {
+    in_place_translation = in_place ? [0, 0, 2*$h3+e] : [0, 0, 0];
+    in_place_rotation = in_place ? [0, 0, 135] : [0, 0, 0];
     
-//    translate([0, 0, -$purple_h + 12])
-    rotate([0, 0, 135])
+    rotate(in_place_rotation)
+    translate(in_place_translation)
+    translate([0, 0, $plug_pcb_leg_z])
     union() {
         translate([-$plug_pcb_x/2 - 2*$h3 + $w5/2 , 0, 0])
         {
             // PCB
-            translate([0, 0, -pcb_z/2])
-            cube([$plug_pcb_x, $plug_pcb_y, pcb_z], center=true);
+            translate([0, 0, -$plug_pcb_pcb_z/2+e])
+            cube([$plug_pcb_x, $plug_pcb_y, $plug_pcb_pcb_z], center=true);
             
             
             // Legs
-            translate([0, 0, -leg_z/2])
-            cube([$plug_pcb_x-2*leg_offset, $plug_pcb_y-2*leg_offset, leg_z], center=true);
+            translate([0, 0, -$plug_pcb_leg_z/2])
+            cube([$plug_pcb_x-2*$plug_pcb_leg_offset, $plug_pcb_y-2*$plug_pcb_leg_offset, $plug_pcb_leg_z], center=true);
         }
         
         
         // Plug
-        translate([0, -plug_y/2, 0])
-        cube([$w5, plug_y, plug_z]);
+        translate([0, -$plug_pcb_plug_y/2, 0])
+        cube([$w5, $plug_pcb_plug_y, $plug_pcb_plug_z]);
     }
 }
