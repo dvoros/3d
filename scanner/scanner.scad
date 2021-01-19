@@ -15,16 +15,15 @@ $fn=30;
 //gear();
 //platform(75/2);
 //motor_platform(75/2);
-//maxi_station() motor_holes();
+//motor_holes();
 //driver_gear(tooth_number=20, inverted=true);
 //bearing_inner();
 
 
-//maxi_station()
 //slip_ring();
 
 cut_x()
-maxi_station() {
+{
     color("blue")
     station_blue(in_place=true);
     
@@ -52,13 +51,11 @@ maxi_station() {
     %cut_x()
     slip_ring(in_place=true);
 };
-//maxi_station()
 //color("yellow")
 //voltage_plug(in_place=true);
 
 
 
-//maxi_station()
 //station_pink();
 //station_purple();
 //station_green();
@@ -66,7 +63,7 @@ maxi_station() {
 //station_blue();
 
 
-//maxi_station() {
+
 //    projection()
 //    station_green();
 //    
@@ -78,9 +75,7 @@ maxi_station() {
 //    
 //
 //    mini_stand();
-//}
 
-//maxi_station()
 //mini_stand();
 //superhack();
 
@@ -89,206 +84,205 @@ maxi_station() {
 //ybearing_plug_m4();
 //y_gear();
 
-//maxi_station()
 //hall_hole();
 
 
 
-module maxi_station() {
-    //
-    // Slacks
-    //
-    
-    // "no slack"
-    $s0 = 0;
-    // very tight fit
-    $s1 = 0.15;
-    // easy fit
-    $s2 = 0.3;
-    // tight fit
-    $s3 = 0.2;
-    // needs to be pulled together with a bolt to get a tight fit
-    $s4 = 0.4;
-    // can't touch
-    $s5 = 0.8;
-    
-    // Parameters of bearing responsible for horizontal rotation of the plate
-    $xbearing_inner_d = 50;
-    $xbearing_outer_d = 72;
-    $xbearing_h = 12;
-    
-    // Parameters of bearing responsible for vertical rotation of the LIDAR mount
-    $ybearing_inner_d = 6;
-    $ybearing_outer_d = 13;
-    $ybearing_h = 5;
-    
-    // Tooth numbers for the horizontal gears
-    $base_tooth_num = 100;
-    $xdriver_tooth_num = 25;
-    
-    // Tooth numbers for the vertical gears
-    $stand_tooth_num = 60;
-    $ydriver_tooth_num = 20;
-    
-    $bolt_ygear_r = 16;
-    
-    $gear_h = 10;
-    
-    $motor_d = 54; // diameter of circle on plate for motor
-    $motor_h = 40;
-    $motor_w = 42;
-    $motor_shaft_h = 23;
-    $motor_shaft_d = 5;
-    
-    $leg_wall_d = 15;
-    
-    $main_pcb_x = 72;
-    $main_pcb_y = 72;
-    $main_pcb_hole_dist = 65;
-    $main_pcb_hole_offset_x = 4.2; // distance of top-left hole (center) from the left
-    $main_pcb_hole_offset_y = 3.5; // distance of top-left hole (center) from the top
-    
-    $plug_pcb_x = 23;
-    $plug_pcb_y = 11;
-    
-    $magnet_d=3;
-    $magnet_h=1.7;
-    
-    $mount_y=($stand_tooth_num-2)/sqrt(2); // depth of mount
-    $mount_h=$ybearing_h; // wall width for mount (needs to fit bearing)
-    $mount_magnet_shaft_dist=$mount_y/2;
-    
-    
-    $slip_ring_small_d = 7.8;
-    $slip_ring_small_h = 8.5;
-    $slip_ring_plate_d = 43.8;
-    $slip_ring_plate_h = 2.5;
-    $slip_ring_large_d = 21.8;
-    $slip_ring_large_h = 28-$slip_ring_plate_h;
-    $slip_ring_hole_r = $slip_ring_plate_d/2-4.2; // radius of the circle that the holes lie on
-    $slip_ring_hole_d = 5.5; // diameter of holes
-    $slip_ring_wire_slack = 10; // necessary distance for wires to bend
-    $slip_ring_conduit_d = 8;
-    
-    $lidar_bolts_x=28.6;
-    $lidar_bolts_y=27.4;
-    
-    // M2 nut+bolt parameters
-    // All these need at least a tight fit slack (0.2)
-    // on their diameter to make a socket
-    $m2_body_d = 2.0;
-    $m2_head_d = 4;
-    $m2_head_h = 1.8;
-    $m2_nut_square = 4;
-    $m2_nut_d = 4.6; // ~= $m2_nut_square / cos(30)
-    $m2_nut_h = 1.5;
-    $m2_body_after_nut_safety = $m2_nut_h + 2.0;
-    
-    // M3 nut+bolt parameters
-    // All these need at least a tight fit slack (0.2)
-    // on their diameter to make a socket
-    $m3_body_d = 3.0;
-    $m3_head_d = 5.8;
-    $m3_head_h = 2.4;
-    $m3_nut_square = 5.4;
-    $m3_nut_d = 6.2; // ~= $m3_nut_square / cos(30)
-    $m3_nut_h = 2.3;
-    $m3_body_after_nut_safety = $m3_nut_h + 2.0;
-    
-    // M4 nut+bolt parameters
-    // All these need at least a tight fit slack (0.2)
-    // on their diameter to make a socket
-    $m4_body_d = 4.0;
-    $m4_head_d = 8.0;
-    $m4_head_h = 3.2;
-    $m4_nut_square = 6.8;
-    $m4_nut_d = 7.8; // ~= $m4_nut_square / cos(30)
-    $m4_nut_h = 3.0;
-    $m4_body_after_nut_safety = $m4_nut_h + 2.0;
-    
-    // Bolt lengths
-    $bolt_inner_body_len = 25;
-    $bolt_outer_body_len = 40;
-    
-    //
-    // Voltage source PCB parameters
-    //
-    $plug_pcb_pcb_z = 1.6 + 2*$s3;
-    $plug_pcb_plug_z = 10.9 + 2*$s3;
-    $plug_pcb_plug_y = 10 + 2*$s3;
-    $plug_pcb_plug_dist = 3.7; // from the back of the PCB
-    $plug_pcb_leg_offset = 1; // from the sides of the PCB
-    $plug_pcb_leg_z = 4.5 + 2*$s3;
-    $plug_pcb_h = $plug_pcb_leg_z + $plug_pcb_plug_z;
-    
-    // REST IS CALCULATED, DO NOT EDIT!
-    
-    // width where nut is embeddable (horizontally)
-    $h1m3 = ($m3_nut_h + $s3) * 2; echo($h1m3=$h1m3);
-    $h1m4 = ($m4_nut_h + $s3) * 2; echo($h1m4=$h1m4);
-    // diameter where nut is embeddable in the center (vertically)
-    $h2m3 = ($m3_nut_d + $s3) * 2; echo($h2m3=$h2m3);
-    $h2m4 = ($m4_nut_d + $s3) * 2; echo($h2m4=$h2m4);
-    // rigid wall width
-    $h3 = 0.8;
-    // place for an M4 head that can't touch the ceiling
-    $h4 = $m4_head_h + 2*$s5;
-    
-    $w1 = $xbearing_inner_d - $s2;
-    $w2 = $xbearing_inner_d + ($xbearing_outer_d - $xbearing_inner_d) / 3;
-    $w3 = $xbearing_outer_d - ($xbearing_outer_d - $xbearing_inner_d) / 3;
-    $w4 = $xbearing_outer_d + $s2;
-    $w5_min = $w4 + 2*$h2m4;
-    $w5 = $base_tooth_num + 2;
-    
-    $leg_pcb_gap = 2*$s5;
-    
-    $plate_d = $w5;
-    $plate_h = $h1m3;
-    
-    $xmotor_x = ($base_tooth_num+$xdriver_tooth_num)/2;
-    $ymotor_z = ($stand_tooth_num+$ydriver_tooth_num)/2;
-    
-    // TODO: re-enable!!!
+//
+// Slacks
+//
+
+// "no slack"
+$s0 = 0;
+// very tight fit
+$s1 = 0.15;
+// easy fit
+$s2 = 0.3;
+// tight fit
+$s3 = 0.2;
+// needs to be pulled together with a bolt to get a tight fit
+$s4 = 0.4;
+// can't touch
+$s5 = 0.8;
+
+// Parameters of bearing responsible for horizontal rotation of the plate
+$xbearing_inner_d = 50;
+$xbearing_outer_d = 72;
+$xbearing_h = 12;
+
+// Parameters of bearing responsible for vertical rotation of the LIDAR mount
+$ybearing_inner_d = 6;
+$ybearing_outer_d = 13;
+$ybearing_h = 5;
+
+// Tooth numbers for the horizontal gears
+$base_tooth_num = 100;
+$xdriver_tooth_num = 25;
+
+// Tooth numbers for the vertical gears
+$stand_tooth_num = 60;
+$ydriver_tooth_num = 20;
+
+$bolt_ygear_r = 16;
+
+$gear_h = 10;
+
+$motor_d = 54; // diameter of circle on plate for motor
+$motor_h = 40;
+$motor_w = 42;
+$motor_shaft_h = 23;
+$motor_shaft_d = 5;
+
+$leg_wall_d = 15;
+
+$main_pcb_x = 72;
+$main_pcb_y = 72;
+$main_pcb_hole_dist = 65;
+$main_pcb_hole_offset_x = 4.2; // distance of top-left hole (center) from the left
+$main_pcb_hole_offset_y = 3.5; // distance of top-left hole (center) from the top
+
+$plug_pcb_x = 23;
+$plug_pcb_y = 11;
+
+$magnet_d=3;
+$magnet_h=1.7;
+
+$mount_y=($stand_tooth_num-2)/sqrt(2); // depth of mount
+$mount_h=$ybearing_h; // wall width for mount (needs to fit bearing)
+$mount_magnet_shaft_dist=$mount_y/2;
+
+
+$slip_ring_small_d = 7.8;
+$slip_ring_small_h = 8.5;
+$slip_ring_plate_d = 43.8;
+$slip_ring_plate_h = 2.5;
+$slip_ring_large_d = 21.8;
+$slip_ring_large_h = 28-$slip_ring_plate_h;
+$slip_ring_hole_r = $slip_ring_plate_d/2-4.2; // radius of the circle that the holes lie on
+$slip_ring_hole_d = 5.5; // diameter of holes
+$slip_ring_wire_slack = 10; // necessary distance for wires to bend
+$slip_ring_conduit_d = 8;
+
+$lidar_bolts_x=28.6;
+$lidar_bolts_y=27.4;
+
+// M2 nut+bolt parameters
+// All these need at least a tight fit slack (0.2)
+// on their diameter to make a socket
+$m2_body_d = 2.0;
+$m2_head_d = 4;
+$m2_head_h = 1.8;
+$m2_nut_square = 4;
+$m2_nut_d = 4.6; // ~= $m2_nut_square / cos(30)
+$m2_nut_h = 1.5;
+$m2_body_after_nut_safety = $m2_nut_h + 2.0;
+
+// M3 nut+bolt parameters
+// All these need at least a tight fit slack (0.2)
+// on their diameter to make a socket
+$m3_body_d = 3.0;
+$m3_head_d = 5.8;
+$m3_head_h = 2.4;
+$m3_nut_square = 5.4;
+$m3_nut_d = 6.2; // ~= $m3_nut_square / cos(30)
+$m3_nut_h = 2.3;
+$m3_body_after_nut_safety = $m3_nut_h + 2.0;
+
+// M4 nut+bolt parameters
+// All these need at least a tight fit slack (0.2)
+// on their diameter to make a socket
+$m4_body_d = 4.0;
+$m4_head_d = 8.0;
+$m4_head_h = 3.2;
+$m4_nut_square = 6.8;
+$m4_nut_d = 7.8; // ~= $m4_nut_square / cos(30)
+$m4_nut_h = 3.0;
+$m4_body_after_nut_safety = $m4_nut_h + 2.0;
+
+// Bolt lengths
+$bolt_inner_body_len = 25;
+$bolt_outer_body_len = 40;
+
+//
+// Voltage source PCB parameters
+//
+$plug_pcb_pcb_z = 1.6 + 2*$s3;
+$plug_pcb_plug_z = 10.9 + 2*$s3;
+$plug_pcb_plug_y = 10 + 2*$s3;
+$plug_pcb_plug_dist = 3.7; // from the back of the PCB
+$plug_pcb_leg_offset = 1; // from the sides of the PCB
+$plug_pcb_leg_z = 4.5 + 2*$s3;
+$plug_pcb_h = $plug_pcb_leg_z + $plug_pcb_plug_z;
+
+// REST IS CALCULATED, DO NOT EDIT!
+
+// width where nut is embeddable (horizontally)
+$h1m3 = ($m3_nut_h + $s3) * 2; echo($h1m3=$h1m3);
+$h1m4 = ($m4_nut_h + $s3) * 2; echo($h1m4=$h1m4);
+// diameter where nut is embeddable in the center (vertically)
+$h2m3 = ($m3_nut_d + $s3) * 2; echo($h2m3=$h2m3);
+$h2m4 = ($m4_nut_d + $s3) * 2; echo($h2m4=$h2m4);
+// rigid wall width
+$h3 = 0.8;
+// place for an M4 head that can't touch the ceiling
+$h4 = $m4_head_h + 2*$s5;
+
+$w1 = $xbearing_inner_d - $s2;
+$w2 = $xbearing_inner_d + ($xbearing_outer_d - $xbearing_inner_d) / 3;
+$w3 = $xbearing_outer_d - ($xbearing_outer_d - $xbearing_inner_d) / 3;
+$w4 = $xbearing_outer_d + $s2;
+$w5_min = $w4 + 2*$h2m4;
+$w5 = $base_tooth_num + 2;
+
+$leg_pcb_gap = 2*$s5;
+
+$plate_d = $w5;
+$plate_h = $h1m3;
+
+$xmotor_x = ($base_tooth_num+$xdriver_tooth_num)/2;
+$ymotor_z = ($stand_tooth_num+$ydriver_tooth_num)/2;
+
+// TODO: re-enable!!!
 //    assert($w5 >= $w5_min, str("teeth number is too small to fit (",$w5,"<",$w5_min,")"));
+
+// Radius of cirlce on which to place the bolts on
+$bolt_inner_r = $w1/2 - $h2m3/2;
+$bolt_outer_r = $w5/2 - $h2m4/2;
+
+// Desired distrance of nuts from the heads
+$bolt_inner_nut_z = $bolt_inner_body_len - $m4_body_after_nut_safety;
+$bolt_outer_nut_z = $bolt_outer_body_len - $m4_body_after_nut_safety;
+
+// Middle of bearing is positioned in the center
+// relative positions follow
+
+$orange_h = $h1m4;
+
+// height of green part (added up from top to bottom)
+$green_h =
+    $plate_h // plate height
+    + $s5 + $orange_h // space for ORANGE
+    + ($xbearing_h/2 - $s4); // within bearing
+$plate_z = $green_h + $s4;
     
-    // Radius of cirlce on which to place the bolts on
-    $bolt_inner_r = $w1/2 - $h2m3/2;
-    $bolt_outer_r = $w5/2 - $h2m4/2;
-    
-    // Desired distrance of nuts from the heads
-    $bolt_inner_nut_z = $bolt_inner_body_len - $m4_body_after_nut_safety;
-    $bolt_outer_nut_z = $bolt_outer_body_len - $m4_body_after_nut_safety;
-    
-    // Middle of bearing is positioned in the center
-    // relative positions follow
-    
-    $orange_h = $h1m4;
-    
-    // height of green part (added up from top to bottom)
-    $green_h =
-        $plate_h // plate height
-        + $s5 + $orange_h // space for ORANGE
-        + ($xbearing_h/2 - $s4); // within bearing
-    $plate_z = $green_h + $s4;
-        
-    // height of blue part (added up from top to bottom)
-    $blue_h = ($xbearing_h/2 - $s4) + $h1m3;
-    
-    // height of purple part (added up from top to bottom)
-    $purple_h_min = $slip_ring_small_h + $slip_ring_wire_slack - $h4;
-    
-    $purple_h = 2*$h3 + $plug_pcb_h;
-    
-    // height of pink part (added up from top to bottom)
-    $pink_h = ($xbearing_h - $s4) + $h4 + $h1m3;
-    
-    // the very bottom when everything's in place
-    $bottom_z = -($purple_h+$pink_h + $s4 - $xbearing_h/2);
-    
-    
-    children();
-}
+// height of blue part (added up from top to bottom)
+$blue_h = ($xbearing_h/2 - $s4) + $h1m3;
+
+// height of purple part (added up from top to bottom)
+$purple_h_min = $slip_ring_small_h + $slip_ring_wire_slack - $h4;
+
+$purple_h = 2*$h3 + $plug_pcb_h;
+
+// height of pink part (added up from top to bottom)
+$pink_h = ($xbearing_h - $s4) + $h4 + $h1m3;
+
+// the very bottom when everything's in place
+$bottom_z = -($purple_h+$pink_h + $s4 - $xbearing_h/2);
+
+//
+// END OF PARAMETERS
+//
+
 
 module superhack() {
     x=7.5;
