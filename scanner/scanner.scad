@@ -5,16 +5,16 @@
 // - same words used with multiple meaning:
 //    - leg
 //    - plug
-// - gradle build
 
 use <../lib/chrisspen_gears/gears.scad>;
 use <../lib/mylib.scad>;
 
 e=0.01;
 color_orange=[255/255, 165/255, 0/255];
+
 $fn=30;
 
-mode="stand";
+part="stand";
 
 
 //
@@ -229,7 +229,7 @@ $bottom_z = -($purple_h+$pink_h + $s4 - $xbearing_h/2);
 
 // Shows all parts of the base station cut in half.
 // Useful when working on the base station.
-if (mode == "station_cut") {
+if (part == "station_cut") {
     cut_x()
     {
         base_station();
@@ -242,7 +242,7 @@ if (mode == "station_cut") {
 }
 
 // All the stand together (everything that atands on the plate).
-if (mode == "stand") {
+if (part == "stand") {
     // plate
     % projection()
     station_green();
@@ -250,24 +250,27 @@ if (mode == "stand") {
     stand();
 }
 
-if (mode == "everything") {
+if (part == "everything") {
     base_station();
     %station_bolts();
     translate([0, 0, $plate_z])
     stand();
 }
 
-if (mode == "pink") station_pink();
-if (mode == "purple") station_purple();
-if (mode == "orange") station_orange();
-if (mode == "green") station_green();
-if (mode == "blue") station_blue();
+if (part == "pink") station_pink();
+if (part == "purple") station_purple();
+if (part == "orange") station_orange();
+if (part == "green") station_green();
+if (part == "blue") station_blue();
 
-if (mode == "x_driver_gear") driver_gear(tooth_number=$xdriver_tooth_num, inverted=true);
-if (mode == "y_driver_gear") driver_gear(tooth_number=$ydriver_tooth_num, inverted=true);
-if (mode == "y_gear_plug") ygear_plug_m4();
-if (mode == "y_bearing_plug") ybearing_plug_m4();
-if (mode == "y_gear") y_gear();
+if (part == "x_driver_gear") driver_gear(tooth_number=$xdriver_tooth_num, inverted=true);
+if (part == "y_driver_gear") driver_gear(tooth_number=$ydriver_tooth_num, inverted=true);
+if (part == "y_gear_plug") ygear_plug_m4();
+if (part == "y_bearing_plug") ybearing_plug_m4();
+if (part == "y_gear") y_gear();
+if (part == "idle_leg") idle_leg();
+if (part == "driver_leg") driver_leg();
+if (part == "mount") mount();
 
 module base_station() {
     color("blue")
@@ -575,19 +578,6 @@ module leg_zprojection() {
     }
 }
 
-module stand1(in_place=false) {
-    $stand_leg_foot_d=20;
-    
-//    mirror_x()
-    mirror_y()
-    #translate([$main_pcb_x/2+$s5, $motor_w/2+$s5])
-    hull() {
-        translate([$stand_leg_foot_d, $stand_leg_foot_d/2, 0])
-        circle(d=$stand_leg_foot_d);
-        square([$stand_leg_foot_d/2, $stand_leg_foot_d]);
-    }
-}
-
 module station_orange(in_place=false) {
     in_place_z = in_place ? $xbearing_h/2 : 0;
     translate([0, 0, in_place_z])
@@ -798,9 +788,7 @@ module station_blue(in_place=false) {
 }
 
 module station_bolts() {
-    // inner TODO: slip ring bolts!!!
     z_rot_copy(r=$slip_ring_hole_r, deg=120)
-//    translate([0, 0, $blue_h+$s4])
     translate([0, 0, $bolt_inner_body_len - $blue_h - $s4])
     rotate([180, 0, 0])
     m4_with_nut(l=$bolt_inner_body_len, nut_z=$bolt_inner_nut_z, center=false);
@@ -1105,7 +1093,6 @@ module plug(h=$ybearing_h, gap=$s5) {
 module driver_gear(tooth_number=25, nut_h = 2.5, nut_w=5.6, h=16, inverted=true) {
     invert_rotation = inverted ? 180 : 0;
     
-//    render(convexity = 2)
     difference() {
         union() {
             // inverted

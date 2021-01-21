@@ -1,0 +1,34 @@
+import static groovy.io.FileType.*
+
+def outputDir = 'stl/'
+def inputFile=file("scanner.scad")
+
+def parts = [
+    'pink',
+    'purple',
+    'orange',
+    'green',
+    'blue',
+    'x_driver_gear',
+    'y_driver_gear',
+    'y_gear',
+    'mount',
+    'idle_leg',
+    'driver_leg',
+    'y_gear_plug',
+    'y_bearing_plug',
+]
+
+task allStl() {}
+
+parts.each { part ->
+    println "found part: ${part}"
+    def outputFile = new File(outputDir,"${part}.stl")
+    def t = task("stl_${part}", type:Exec) {
+        inputs.file inputFile
+        outputs.file outputFile
+        environment('OPENSCADPATH','../libraries/')
+        commandLine "openscad","-D","part=\"$part\"","-D",'$fn=80',"-o",outputFile,inputFile
+    }
+    allStl.dependsOn(t)
+}
