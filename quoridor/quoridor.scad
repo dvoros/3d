@@ -5,7 +5,7 @@ th=5;
 // wall height
 wh=15;
 // slack
-s=0.1;
+s=0.2;
 
 
 // number of ditches
@@ -40,10 +40,10 @@ cw=dd-dw;
 // pawn width
 pw=0.8*cw;
 
-//mini_board();
+mini_board();
 //board();
 //pawn();
-wall();
+//wall();
 
 module pawn() {
     $fn=40;
