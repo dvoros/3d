@@ -6,11 +6,18 @@ EXE="openscad"
 
 mkdir -p "$OUT"
 
-function char {
-	$EXE -o "$OUT/$1.stl" -D "char=\"$1\"" $SCAD
+function letter {
+	$EXE -o "$OUT/$1.stl" -D "char=\"$1\"" -D "piece=\"letter\"" $SCAD
 }
 
-for ch in {{a..z},{A..Z},{0..9}}; do
-  char $ch
+function holder {
+	$EXE -o "$OUT/_holder$1.stl" -D "size=$1" -D "piece=\"holder\"" $SCAD
+}
+
+for size in {2..10}; do
+  holder $size
 done
 
+for ch in {{a..z},{A..Z},{0..9}}; do
+  letter $ch
+done
