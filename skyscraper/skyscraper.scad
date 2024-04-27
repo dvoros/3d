@@ -14,9 +14,13 @@ ss = 0.25;
 sb = 0.3;
 stop = 0.8;
 
-magnet_h=1.7+2*sb;
+// Regular magnet
+magnet_h=1.7+sb;
 magnet_d=3+sb;
-magnet_cover_w=0.4+sb ;
+magnet_cover_w=0.4+sb;
+
+// Bearing ball to be used instead of magnet in the pieces
+bearing_ball_d=6+sb;
 
 // -------------------------
 
@@ -52,9 +56,9 @@ if (piece == "park") {
 if (piece == "manual experimenting") {
 //    board();
 //    mini_board();
-//    building(4);
-    park();
-//    clue(lett="1");
+//    building(1);
+//    park();
+    clue(lett="1");
 
     //translate([0, 0, mark_h/2+bh/2-trench_h])
 //    flag();
@@ -168,8 +172,12 @@ module building(n=1) {
             windows();
             
             // magnet inside
-            translate([0, 0, -height/2+magnet_h/2+magnet_cover_w])
+            %translate([0, 0, -height/2+magnet_h/2+magnet_cover_w])
             cylinder(d=magnet_d, h=magnet_h, center=true);
+            
+            // bearing ball inside
+//            translate([0, 0, -height/2+bearing_ball_d/2+magnet_cover_w])
+//            cylinder(d=bearing_ball_d, h=bearing_ball_d, center=true);
         }
         
         // rooftop

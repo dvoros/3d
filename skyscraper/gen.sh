@@ -2,7 +2,7 @@
 
 SCAD="skyscraper.scad"
 OUT="stl"
-EXE="openscad-nightly"
+EXE="openscad"
 
 function single {
 	$EXE -o "$OUT/$1.stl" -D "piece=\"$1\"" $SCAD
