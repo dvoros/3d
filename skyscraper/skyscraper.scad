@@ -5,7 +5,7 @@ th = 5; // tile_height
 tile_mfr = 0.4;  // mount_width/field_width ratio for inner tiles
 clue_mfr = 0.4; // mount_width/field_width ratio for the clues
 tfr = 0.75; // tile_width/field_width width ratio
-lh = 2; // letter height
+lh = 0.6; // letter height
 trench_w = 1; // trench width
 trench_h = 1; // trench width
 mark_h = 3; // mark_height (should be bigger then trench_h)
@@ -40,6 +40,12 @@ num = 1;
 if (piece == "clue") {
     clue(string);
 }
+if (piece == "clue_multi_color_base") {
+    clue_multi_color_base(string);
+}
+if (piece == "clue_multi_color_letter") {
+    clue_multi_color_letter(string);
+}
 if (piece == "tile") {
     building(n=num);
 }
@@ -52,13 +58,16 @@ if (piece == "mini_board") {
 if (piece == "park") {
     park();
 }
+if (piece == "flag") {
+    flag();
+}
 
 if (piece == "manual experimenting") {
 //    board();
 //    mini_board();
-//    building(1);
-//    park();
-    clue(lett="1");
+    building(1);
+%    park();
+//    clue(lett="1");
 
     //translate([0, 0, mark_h/2+bh/2-trench_h])
 //    flag();
@@ -232,17 +241,22 @@ module flag() {
         cylinder(d=magnet_d, h=magnet_h, center=true);
     }
     
-    translate([-level_h, 0, -level_h+5*level_h+e])
-    rotate([0, -45, 0])
-    difference() {
-        rotate([90, 45, 0])
-        cube([2*level_h, 2*level_h, flag_w], center=true);
-            
-        translate([-50, 0, 0])
-        cube([100, 100, 100], center=true);
+    translate([-level_h, 0, 3*level_h+e])
+    {
+        translate([0, 0, 1.5*level_h])
+        cube([2*level_h, 2, level_h], center=true);
+        
+        rotate([0, -45, 0])
+        difference() {
+            rotate([90, 45, 0])
+            cube([2*level_h, 2*level_h, 2], center=true);
+                
+            translate([-50, 0, 0])
+            cube([100, 100, 100], center=true);
+        }
     }
     
-    cylinder(d=flag_w, h=5*level_h);
+    cylinder(d=3, h=5*level_h);
 }
 
 module tree(h, trunk_wr=1.1, crown_hr=1.4, crown_wr=1, crown_y=0) {
@@ -281,6 +295,24 @@ module park() {
     tree(2.3, crown_wr=1.2);
 }
 
+module clue_multi_color_base(lett="") {
+    translate([0, 0, th/2])
+    difference() {
+        cylinder(r = tw/2, h = th, center=true);
+        
+        if (lett != "") {
+            letter(lett, 0.2);
+        }
+    }
+}
+
+module clue_multi_color_letter(lett="") {
+    color([0.1,0.1,0.1])
+    translate([0, 0, th/2])
+    letter(lett, 0.2);
+}
+
+
 module clue(lett="") {
     translate([0, 0, th/2])
     difference() {
@@ -292,10 +324,10 @@ module clue(lett="") {
     }
 }
 
-module letter(lett) {
+module letter(lett, offset_r=0.2) {
     translate([0, 0, th/2-lh])
     linear_extrude(height=lh+e)
-    offset(r = 0.2)
+    offset(r = offset_r)
     text(lett, font="DejaVu Serif:style=Bold", valign="center", halign="center");
 }
 

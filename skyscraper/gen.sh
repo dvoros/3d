@@ -22,7 +22,8 @@ function multi_num {
 
 multi_num tile 6
 multi_string clue 5
+multi_string clue_multi_color_base 5
+multi_string clue_multi_color_letter 5
 single clue
-single board
-single mini_board
+single flag
 single park
