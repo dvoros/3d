@@ -54,12 +54,6 @@ if (piece == "clue_multi_color_letter") {
 if (piece == "tile") {
     building(n=num);
 }
-if (piece == "board") {
-    board();
-}
-if (piece == "mini_board") {
-    mini_board();
-}
 if (piece == "park") {
     park();
 }
@@ -68,8 +62,6 @@ if (piece == "flag") {
 }
 
 if (piece == "manual experimenting") {
-//    board();
-//    mini_board();
 //    building(1);
 //%    park();
 //    clue(lett="1");
@@ -200,23 +192,6 @@ module building(n=1) {
     }
 }
 
-module flag3() {
-    flag_w=5;
-    base_height=0.8*th;
-    
-    difference() {
-        translate([0, 0, -base_height/2+e])
-        cube([tw, tw, base_height], center=true);
-        
-        // magnet inside
-        translate([0, 0, -base_height+magnet_h/2+magnet_cover_w])
-        cylinder(d=magnet_d, h=magnet_h, center=true);
-    }
-    
-    translate([-flag_w/2, -flag_w/2, 0])
-    cube([flag_w, flag_w, 5*level_h]);
-}
-
 module flag() {
     flag_w=4;
     base_height=0.6*th;
@@ -325,79 +300,4 @@ module letter(lett, offset_r=0.2) {
     linear_extrude(height=lh+e)
     offset(r = offset_r)
     text(lett, font="DejaVu Serif:style=Bold", valign="center", halign="center");
-}
-
-module mini_board() {
-    intersection() {
-        board();
-        
-        translate([n/2*fw, n/2*fw, 0])
-        cube(2*fw+e, center = true);
-    }
-}
-
-module board() {
-    difference() {
-        // board itself
-        cube([(n+2)*fw, (n+2)*fw, bh], center=true);
-        
-
-        // clues
-        for (i = [-1 : n]) {
-            for (j = [-1 : n]) {
-                translate([-d + i*fw, -d + j * fw, bh/2+th/2-2*trench_h])
-                if (i == -1 || i == n || j == -1 || j == n) {
-                    cylinder(d = tw+2*sb, h = th, center=true);
-                }
-            }
-        }
-        
-        // buildings 
-        for (i = [0 : n-1]) {
-            for (j = [0 : n-1]) {
-                translate([-d + i*fw, -d + j * fw, 0])
-                {
-                    // 
-                    translate([0, 0, bh/2-trench_h+e])
-                    linear_extrude(height=trench_h)
-                    offset(delta=sb)
-                    projection()
-                    building(1);
-                    
-                    // magnet inside
-                    translate([0, 0, bh/2-magnet_h/2-trench_h-magnet_cover_w])
-                    cylinder(d=magnet_d, h=magnet_h, center=true);
-                }
-            }
-        }
-        
-        // cut off corners
-        mirror_x()
-        mirror_y()
-        translate([(n+2)/2 * fw, (n+2)/2 * fw, 0])
-        rotate([0, 0, 135])
-        rounded_cut();
-
-    }
-}
-
-// used for cutting rounded corners
-module rounded_cut() {
-    cw = 1.5 * sqrt(2) * fw + e;
-    x = (fw/2)/sqrt(2);
-    difference() {
-        union() {
-        translate([0, cw/2-x, 0])
-        cylinder(d=fw, h=2*th, center=true);
-        
-        
-        cube([cw, cw, 2*th-2*e], center = true);
-        }
-        
-        translate([cw/2-x, cw/2+x, 0])
-        cylinder(d=fw, h=2*th, center=true);
-        
-        translate([-cw/2+x, cw/2+x, 0])
-        cylinder(d=fw, h=2*th, center=true);
-    }
 }
