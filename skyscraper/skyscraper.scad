@@ -1,14 +1,11 @@
 n = 4;
 
 fw = 20; // field_width
-th = 5; // tile_height
 tile_mfr = 0.4;  // mount_width/field_width ratio for inner tiles
 clue_mfr = 0.4; // mount_width/field_width ratio for the clues
 tfr = 0.75; // tile_width/field_width width ratio
 lh = 0.6; // letter height
-trench_w = 1; // trench width
-trench_h = 1; // trench width
-mark_h = 3; // mark_height (should be bigger then trench_h)
+clue_height = 5;
 
 ss = 0.25;
 sb = 0.3;
@@ -22,15 +19,15 @@ stop = 0.8;
 // 4x2 magnet
 magnet_h=2+sb;
 magnet_d=4+sb;
-magnet_cover_w=0.4+sb;
+magnet_cover_w=0.6;
 
 // Bearing ball to be used instead of magnet in the pieces
 bearing_ball_d=6+sb;
 
 // -------------------------
 
-level_h=th/2;  // level height (in buildings)
-bh = trench_h+magnet_h+2*magnet_cover_w; // board_height
+level_h=3;  // level height (in buildings)
+base_height=magnet_h+2*magnet_cover_w; // base heights
 
 $fn=50;
 e = 0.01;
@@ -62,14 +59,12 @@ if (piece == "flag") {
 }
 
 if (piece == "manual experimenting") {
-//    building(1);
-//%    park();
+//    building(2);
+//    park();
 //    clue(lett="1");
-
-    //translate([0, 0, mark_h/2+bh/2-trench_h])
-    flag();
-//    flag2();
-//    flag3();
+//    flag();
+    clue_multi_color_base("1");
+    clue_multi_color_letter("1");
 }
 
 module rotz() {
@@ -94,24 +89,25 @@ module mirror_y() {
 }
 
 module building(n=1) {
-    height=th + level_h*(n);
+    height=level_h*(n) + 2;
     
     building_width=tw-2.1;
     
     module windows() {
         x = building_width/5; // width of window
+        y = 1.6;
         
         difference() {
             union() {
                 rotz()
                 for (i = [0:n-1]) {
                     for (j = [-1:1]) {
-                        translate([-e, 1.5*j*x, height/2-x-i*(level_h)])
-                        cube([building_width+4*e, x, x/2], center=true);
+                        translate([0, 1.5*j*x, 1+level_h/2+i*(level_h)])
+                        cube([building_width+4*e, x, y], center=true);
                     }
                 }
             }
-            cube([0.9*building_width,0.9*building_width,height], center=true);
+            cube([0.9*building_width,0.9*building_width,3*height], center=true);
         }
     }
     
@@ -150,28 +146,26 @@ module building(n=1) {
         ];
         number = numbers[n-1];
         x = building_width/4;
-        rh = 0.15*building_width;
+        rh = 1.8;
         for (i = [0:2]) {
             for (j = [0:2]) {
                 if (number[i][j] == 1) {
-                    translate([(i-1)*building_width/3, (j-1)*building_width/3, (height + rh)/2-e])
+                    translate([(i-1)*building_width/3, (j-1)*building_width/3, height+rh/2])
                     cube([x, x, rh], center=true);
                 }
             }
         }
     }
     
-    translate([0, 0, height/2])
     union() {
         difference() {
             // main building
             union() {
                 // base
-                base_height=0.6*th;
-                translate([0, 0, -height/2+base_height/2])
+                translate([0, 0, -base_height/2])
                 cube([tw, tw, base_height], center=true);
                 // top
-                translate([0, 0, e])
+                translate([0, 0, height/2])
                 cube([building_width, building_width, height], center=true);
             }
             
@@ -179,7 +173,7 @@ module building(n=1) {
             windows();
             
             // magnet inside
-            translate([0, 0, -height/2+magnet_h/2+magnet_cover_w])
+            translate([0, 0, -magnet_h/2-magnet_cover_w])
             cylinder(d=magnet_d, h=magnet_h, center=true);
             
             // bearing ball inside
@@ -193,37 +187,31 @@ module building(n=1) {
 }
 
 module flag() {
-    flag_w=4;
-    base_height=0.6*th;
-    
-    translate([0, 0, base_height])
-    {        
-        difference() {
-            translate([0, 0, -base_height/2+e])
-            cube([tw, tw, base_height], center=true);
-            
-            // magnet inside
-            translate([0, 0, -base_height+magnet_h/2+magnet_cover_w])
-            cylinder(d=magnet_d, h=magnet_h, center=true);
-        }
+    difference() {
+        translate([0, 0, -base_height/2])
+        cube([tw, tw, base_height], center=true);
         
-        translate([-level_h, 0, 3*level_h+e])
-        {
-            translate([0, 0, 1.5*level_h])
-            cube([2*level_h, 2, level_h], center=true);
-            
-            rotate([0, -45, 0])
-            difference() {
-                rotate([90, 45, 0])
-                cube([2*level_h, 2*level_h, 2], center=true);
-                    
-                translate([-50, 0, 0])
-                cube([100, 100, 100], center=true);
-            }
-        }
-        
-        cylinder(d=3, h=5*level_h);
+        // magnet inside
+        translate([0, 0, -magnet_h/2-magnet_cover_w])
+        cylinder(d=magnet_d, h=magnet_h, center=true);
     }
+    
+    translate([-level_h, 0, 3*level_h])
+    {
+        translate([0, 0, 1.5*level_h])
+        cube([2*level_h, 2.2, level_h], center=true);
+        
+        rotate([0, -45, 0])
+        difference() {
+            rotate([90, 45, 0])
+            cube([2*level_h, 2*level_h, 2.2], center=true);
+                
+            translate([-50, 0, 0])
+            cube([100, 100, 100], center=true);
+        }
+    }
+    
+    cylinder(d=4, h=5*level_h);
 }
 
 module tree(h, trunk_wr=1.1, crown_hr=1.4, crown_wr=1, crown_y=0) {
@@ -236,40 +224,34 @@ module tree(h, trunk_wr=1.1, crown_hr=1.4, crown_wr=1, crown_y=0) {
 }
 
 module park() {
-    
-    base_height=0.6*th;
-    
-    translate([0, 0, base_height])
-    {
-        difference() {
-            translate([0, 0, -base_height/2+e])
-            cube([tw, tw, base_height], center=true);
-            
-            // magnet inside
-            translate([0, 0, -base_height+magnet_h/2+magnet_cover_w])
-            cylinder(d=magnet_d, h=magnet_h, center=true);
-        }
+    difference() {
+        translate([0, 0, -base_height/2])
+        cube([tw, tw, base_height], center=true);
         
-        tree(3.7);
-        
-        translate([-0.3*tw, 0.25*tw, 0])
-        tree(1.7, trunk_wr=1.5, crown_hr=1.2, crown_wr=1.3, crown_y=-0.8);
-        
-        translate([0.25*tw, 0.2*tw, 0])
-        tree(1.9, trunk_wr=1.7, crown_wr=1.2, crown_y=-1.2);
-        
-        translate([0.2*tw, -0.2*tw, 0])
-        tree(2.7);
-        
-        translate([-0.29*tw, -0.32*tw, 0])
-        tree(2.3, crown_wr=1.2);
+        // magnet inside
+        translate([0, 0, -magnet_h/2-magnet_cover_w])
+        cylinder(d=magnet_d, h=magnet_h, center=true);
     }
+    
+    tree(3.7);
+    
+    translate([-0.3*tw, 0.25*tw, 0])
+    tree(1.7, trunk_wr=1.5, crown_hr=1.2, crown_wr=1.3, crown_y=-0.8);
+    
+    translate([0.25*tw, 0.2*tw, 0])
+    tree(1.9, trunk_wr=1.7, crown_wr=1.2, crown_y=-1.2);
+    
+    translate([0.2*tw, -0.2*tw, 0])
+    tree(2.7);
+    
+    translate([-0.29*tw, -0.32*tw, 0])
+    tree(2.3, crown_wr=1.2);  
 }
 
 module clue_multi_color_base(lett="") {
-    translate([0, 0, th/2])
+    translate([0, 0, clue_height/2])
     difference() {
-        cylinder(r = tw/2, h = th, center=true);
+        cylinder(r = tw/2, h = clue_height, center=true);
         
         if (lett != "") {
             letter(lett, 0.2);
@@ -279,15 +261,15 @@ module clue_multi_color_base(lett="") {
 
 module clue_multi_color_letter(lett="") {
     color([0.1,0.1,0.1])
-    translate([0, 0, th/2])
+    translate([0, 0, clue_height/2])
     letter(lett, 0.2);
 }
 
 
 module clue(lett="") {
-    translate([0, 0, th/2])
+    translate([0, 0, clue_height/2])
     difference() {
-        cylinder(r = tw/2, h = th, center=true);
+        cylinder(r = tw/2, h = clue_height, center=true);
         
         if (lett != "") {
             letter(lett);
@@ -296,7 +278,7 @@ module clue(lett="") {
 }
 
 module letter(lett, offset_r=0.2) {
-    translate([0, 0, th/2-lh])
+    translate([0, 0, clue_height/2-lh])
     linear_extrude(height=lh+e)
     offset(r = offset_r)
     text(lett, font="DejaVu Serif:style=Bold", valign="center", halign="center");
