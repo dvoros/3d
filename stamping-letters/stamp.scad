@@ -59,10 +59,6 @@ module cross_section() {
     polygon([[0, 0], [bottom_x, 0], [bottom_x, bottom], [bottom_x-dx, y], [dx, y], [0, bottom]]);
 }
 
-//module elephant_foot() {
-//    polygon([[-0.5, 0], [bottom_x+0.5, 0], [bottom_x, 1], [0, 1]]);
-//}
-
 module letter_on_top(ch = "W") {
     translate([letter_x, bottom_x/2 + letter_y, y-e])
     linear_extrude(2)
@@ -96,7 +92,6 @@ module holder(letters=10) {
         linear_extrude(1000)
         offset(delta=0.05)
         union() {
-//            elephant_foot();
             cross_section();
         }
         
