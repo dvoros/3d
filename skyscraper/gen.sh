@@ -5,18 +5,21 @@ OUT="stl"
 EXE="openscad"
 
 function single {
-	$EXE -o "$OUT/$1.stl" -D "piece=\"$1\"" $SCAD
+	$EXE -o "$OUT/with-magnet-3x1.7/$1.stl" -D "piece=\"$1\"" -D "magnet=\"3x1.7\"" $SCAD
+	$EXE -o "$OUT/with-magnet-4x2/$1.stl" -D "piece=\"$1\"" -D "magnet=\"4x2\"" $SCAD
 }
 
 function multi_string {
 	for i in `seq 1 $2`; do
-		$EXE -o "$OUT/$1_$i.stl" -D "piece=\"$1\"" -D "string=\"$i\"" $SCAD
+		$EXE -o "$OUT/with-magnet-3x1.7/$1_$i.stl" -D "piece=\"$1\"" -D "string=\"$i\"" -D "magnet=\"3x1.7\"" $SCAD
+		$EXE -o "$OUT/with-magnet-4x2/$1_$i.stl" -D "piece=\"$1\"" -D "string=\"$i\"" -D "magnet=\"4x2\"" $SCAD
 	done
 }
 
 function multi_num {
 	for i in `seq 1 $2`; do
-		$EXE -o "$OUT/$1_$i.stl" -D "piece=\"$1\"" -D "num=$i" $SCAD
+		$EXE -o "$OUT/with-magnet-3x1.7/$1_$i.stl" -D "piece=\"$1\"" -D "num=$i" -D "magnet=\"3x1.7\"" $SCAD
+		$EXE -o "$OUT/with-magnet-4x2/$1_$i.stl" -D "piece=\"$1\"" -D "num=$i" -D "magnet=\"4x2\"" $SCAD
 	done
 }
 
