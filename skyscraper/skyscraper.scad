@@ -6,7 +6,7 @@ clue_mfr = 0.4; // mount_width/field_width ratio for the clues
 tfr = 0.75; // tile_width/field_width width ratio
 lh = 0.6; // letter height
 clue_height = 5;
-tile_corner_radius = 1;
+tile_corner_radius = 2;
 magnet_id = "3x1.7"; // 3x1.7 or 4x2
 assert(magnet_id == "3x1.7" || magnet_id == "4x2", "invalid magned_id");
 
@@ -17,7 +17,7 @@ stop = 0.8;
 magnet_cover_w=0.6;
 
 magnet_h=(magnet_id == "3x1.7") ?  1.7 + 0.3 : 2 + 0.3;
-magnet_d=(magnet_id == "3x1.7") ? 3 + 0.35 : 4 + 0.3;
+magnet_d=(magnet_id == "3x1.7") ? 3 + 0.3 : 4 + 0.3;
 
 // Bearing ball to be used instead of magnet in the pieces
 bearing_ball_d=6+sb;
