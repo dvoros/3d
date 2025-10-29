@@ -278,17 +278,3 @@ module letter(lett, offset_r=0.2) {
     offset(r = offset_r)
     text(lett, font="DejaVu Serif:style=Bold", valign="center", halign="center");
 }
-
-module mirror_x() {
-    children();
-    
-    mirror([1, 0, 0])
-    children();
-}
-
-module mirror_y() {
-    children();
-    
-    mirror([0, 1, 0])
-    children();
-}
