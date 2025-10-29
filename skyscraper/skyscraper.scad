@@ -6,20 +6,21 @@ clue_mfr = 0.4; // mount_width/field_width ratio for the clues
 tfr = 0.75; // tile_width/field_width width ratio
 lh = 0.6; // letter height
 clue_height = 5;
+tile_corner_radius = 1;
 
 ss = 0.25;
 sb = 0.3;
 stop = 0.8;
 
+magnet_cover_w=0.6;
+
 // 3x1.7 magnet
-//magnet_h=1.7+sb;
-//magnet_d=3+sb;
-//magnet_cover_w=0.4+sb;
+magnet_h=1.7 + 0.3;
+magnet_d=3 + 0.35;
 
 // 4x2 magnet
-magnet_h=2+sb;
-magnet_d=4+sb;
-magnet_cover_w=0.6;
+//magnet_h=2+sb;
+//magnet_d=4+sb;
 
 // Bearing ball to be used instead of magnet in the pieces
 bearing_ball_d=6+sb;
@@ -59,12 +60,12 @@ if (piece == "flag") {
 }
 
 if (piece == "manual experimenting") {
-//    building(2);
+    building(2);
 //    park();
 //    clue(lett="1");
 //    flag();
-    clue_multi_color_base("1");
-    clue_multi_color_letter("1");
+//    clue_multi_color_base("1");
+//    clue_multi_color_letter("1");
 }
 
 module rotz() {
@@ -162,8 +163,7 @@ module building(n=1) {
             // main building
             union() {
                 // base
-                translate([0, 0, -base_height/2])
-                cube([tw, tw, base_height], center=true);
+                base_with_magnet();
                 // top
                 translate([0, 0, height/2])
                 cube([building_width, building_width, height], center=true);
@@ -171,10 +171,6 @@ module building(n=1) {
             
             // windows
             windows();
-            
-            // magnet inside
-            translate([0, 0, -magnet_h/2-magnet_cover_w])
-            cylinder(d=magnet_d, h=magnet_h, center=true);
             
             // bearing ball inside
 //            translate([0, 0, -height/2+bearing_ball_d/2+magnet_cover_w])
@@ -187,14 +183,7 @@ module building(n=1) {
 }
 
 module flag() {
-    difference() {
-        translate([0, 0, -base_height/2])
-        cube([tw, tw, base_height], center=true);
-        
-        // magnet inside
-        translate([0, 0, -magnet_h/2-magnet_cover_w])
-        cylinder(d=magnet_d, h=magnet_h, center=true);
-    }
+    base_with_magnet();
     
     translate([-level_h, 0, 3*level_h])
     {
@@ -224,14 +213,7 @@ module tree(h, trunk_wr=1.1, crown_hr=1.4, crown_wr=1, crown_y=0) {
 }
 
 module park() {
-    difference() {
-        translate([0, 0, -base_height/2])
-        cube([tw, tw, base_height], center=true);
-        
-        // magnet inside
-        translate([0, 0, -magnet_h/2-magnet_cover_w])
-        cylinder(d=magnet_d, h=magnet_h, center=true);
-    }
+    base_with_magnet();
     
     tree(3.7);
     
@@ -246,6 +228,22 @@ module park() {
     
     translate([-0.29*tw, -0.32*tw, 0])
     tree(2.3, crown_wr=1.2);  
+}
+
+module base_with_magnet() {
+    difference() {
+        translate([0, 0, -base_height])
+        %linear_extrude(base_height)
+        hull()
+        mirror_x()
+        mirror_y()
+        translate([tw/2 - tile_corner_radius, tw/2 - tile_corner_radius, 0])
+        circle(tile_corner_radius);
+        
+        // magnet inside
+        translate([0, 0, -magnet_h/2-magnet_cover_w])
+        cylinder(d=magnet_d, h=magnet_h, center=true);
+    }
 }
 
 module clue_multi_color_base(lett="") {
@@ -282,4 +280,18 @@ module letter(lett, offset_r=0.2) {
     linear_extrude(height=lh+e)
     offset(r = offset_r)
     text(lett, font="DejaVu Serif:style=Bold", valign="center", halign="center");
+}
+
+module mirror_x() {
+    children();
+    
+    mirror([1, 0, 0])
+    children();
+}
+
+module mirror_y() {
+    children();
+    
+    mirror([0, 1, 0])
+    children();
 }
