@@ -1,13 +1,13 @@
 //First text
-text_1="Customer service:";
+text_1="Customer Service";
 //Second text
 text_2="";
 
 //Rating
-rating=3.5; //[,0,0.5,1,1.5,2,2.5,3,3.5,4,4.5,5]
+rating=4.5;
 
 //Number of colors you want to print with
-colors="three"; // [,two,three]
+colors="three"; // [two,three]
 
 /* [Dimensions] */
 
@@ -29,6 +29,8 @@ stars_scale=100;
 
 /* [Font] */
 
+font_1="Liberation Sans"; //[Liberation Sans,Harmony OS Sans,Inter,Inter Tight,Lora,Merriweather Sans,Montserrat,Noto Sans,Nunito,Nunito Sans,Open Sans,Open Sans Condensed,Oswald,Playfair Display,Plus Jakarta Sans,Raleway,Roboto,Roboto Condensed,Roboto Flex,Roboto Mono,Roboto Serif,Roboto Slab,Rubik,Source Sans 3,Ubuntu Sans,Ubuntu Sans Mono,Work Sans]
+font_2="Liberation Sans"; //[Liberation Sans,Harmony OS Sans,Inter,Inter Tight,Lora,Merriweather Sans,Montserrat,Noto Sans,Nunito,Nunito Sans,Open Sans,Open Sans Condensed,Oswald,Playfair Display,Plus Jakarta Sans,Raleway,Roboto,Roboto Condensed,Roboto Flex,Roboto Mono,Roboto Serif,Roboto Slab,Rubik,Source Sans 3,Ubuntu Sans,Ubuntu Sans Mono,Work Sans]
 //Font size of first text
 font_size_1=10;
 //Font size of second text
@@ -83,13 +85,13 @@ card_edge(width, height, rounded_corner, thickness_top, edge_width);
 // Text 1
 if(text_1!="")
 translate(text_1_pos)
-do_text(text_1, font_size_1, thicknesses);
+do_text(text_1, font_1, font_size_1, thicknesses);
 
 
 // Text 2
 if(text_2!="")
 translate(text_2_pos)
-do_text(text_2, font_size_2, thicknesses);
+do_text(text_2, font_2, font_size_2, thicknesses);
 
 // Star ratings
 translate(stars_pos)
@@ -119,18 +121,6 @@ scale(stars_scales)
     }
 }
 
-
-
-module do_text(txt, font_size, thicknesses) {
-    // Text middle
-    middle(thicknesses[0])
-    do_text_layer(txt, font_size, thicknesses[1]);
-
-    // Text top
-    top(is_three_colors, thicknesses[0]+thicknesses[1])
-    do_text_layer(txt, font_size, thicknesses[2]);
-}
-
 module middle(thickness) {
     translate([0, 0, thickness])
     color("#E4BD68")
@@ -144,9 +134,19 @@ module top(is_three_colors, thickness) {
     children();
 }
 
-module do_text_layer(txt, font_size, thickness) {
+module do_text(txt, font, font_size, thicknesses) {
+    // Text middle
+    middle(thicknesses[0])
+    do_text_layer(txt, font, font_size, thicknesses[1]);
+
+    // Text top
+    top(is_three_colors, thicknesses[0]+thicknesses[1])
+    do_text_layer(txt, font, font_size, thicknesses[2]);
+}
+
+module do_text_layer(txt, font, font_size, thickness) {
     linear_extrude(height=thickness)
-    text(text = txt, size = font_size, halign = "center", valign="center");
+    text(text = txt, font=font, size = font_size, halign = "center", valign="center");
 }
 
 module card_edge(width, height, rounded_corner, thickness, edge_width) {
