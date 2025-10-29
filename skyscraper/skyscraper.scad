@@ -233,7 +233,7 @@ module park() {
 module base_with_magnet() {
     difference() {
         translate([0, 0, -base_height])
-        %linear_extrude(base_height)
+        linear_extrude(base_height)
         hull()
         mirror_x()
         mirror_y()
