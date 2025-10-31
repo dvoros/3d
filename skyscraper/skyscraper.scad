@@ -57,13 +57,17 @@ if (piece == "flag") {
 }
 
 if (piece == "manual experimenting") {
-    building(2);
+    building(3);
 //    park();
 //    clue(lett="1");
 //    flag();
 //    clue_multi_color_base("1");
 //    clue_multi_color_letter("1");
 }
+
+
+echo("tw (tile width)", tw);
+echo("base_height", base_height);
 
 module rotz() {
     children();
@@ -88,19 +92,30 @@ module mirror_y() {
 
 module building(n=1) {
     height=level_h*(n) + 2;
+    echo("building top height", height);
     
     building_width=tw-2.1;
+    echo("building_width", building_width);
     
     module windows() {
         x = building_width/5; // width of window
+        echo("window_width", x);
         y = 1.6;
+        echo("window height", y);
+        
+        window_distance_h = 1.5 * x;
+        echo("window_distance_h", window_distance_h);
+        
+        window_distance_v = level_h;
+        echo("window_distance_v", window_distance_v);
+        
         
         difference() {
             union() {
                 rotz()
                 for (i = [0:n-1]) {
                     for (j = [-1:1]) {
-                        translate([0, 1.5*j*x, 1+level_h/2+i*(level_h)])
+                        translate([0, j*window_distance_h, 1+level_h/2+i*(level_h)])
                         cube([building_width+4*e, x, y], center=true);
                     }
                 }
@@ -144,7 +159,9 @@ module building(n=1) {
         ];
         number = numbers[n-1];
         x = building_width/4;
+        echo("x (roof_x)", x);
         rh = 1.8;
+        echo("rh (roof height)", rh);
         for (i = [0:2]) {
             for (j = [0:2]) {
                 if (number[i][j] == 1) {
