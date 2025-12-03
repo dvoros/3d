@@ -36,15 +36,14 @@ d = (n-1)/2 * fw;
 piece = "manual experimenting";
 string = "";
 num = 1;
+num1 = "1"; // top of clue
+num2 = "2"; // bottom of clue
 
 if (piece == "clue") {
-    clue(string);
-}
-if (piece == "clue_multi_color_base") {
-    clue_multi_color_base(string);
+    clue(num1, num2);
 }
 if (piece == "clue_multi_color_letter") {
-    clue_multi_color_letter(string);
+    clue_multi_color_letter(num1, num2);
 }
 if (piece == "tile") {
     building(n=num);
@@ -57,12 +56,10 @@ if (piece == "flag") {
 }
 
 if (piece == "manual experimenting") {
-    building(3);
+    clue(num1, num2);
 //    park();
-//    clue(lett="1");
 //    flag();
-//    clue_multi_color_base("1");
-//    clue_multi_color_letter("1");
+    clue_multi_color_letter("1", "2");
 }
 
 
@@ -260,37 +257,42 @@ module base_with_magnet() {
     }
 }
 
-module clue_multi_color_base(lett="") {
-    translate([0, 0, clue_height/2])
-    difference() {
-        cylinder(r = tw/2, h = clue_height, center=true);
-        
-        if (lett != "") {
-            letter(lett, 0.2);
-        }
-    }
-}
-
-module clue_multi_color_letter(lett="") {
+// The number written on the clue (to be printed in another color)
+module clue_multi_color_letter(num1="", num2="") {
     color([0.1,0.1,0.1])
-    translate([0, 0, clue_height/2])
-    letter(lett, 0.2);
+    union() {
+        letter_top(num1);
+        letter_bottom(num2);
+    }
 }
 
-
-module clue(lett="") {
-    translate([0, 0, clue_height/2])
+// A clue cylinder with the numbers cut out of it
+module clue(num1="", num2="") {
     difference() {
         cylinder(r = tw/2, h = clue_height, center=true);
         
-        if (lett != "") {
-            letter(lett);
+        if (num1 != "") {
+            letter_top(num1);
+        }
+        
+        if (num2 != "") {
+            letter_bottom(num2);
         }
     }
+}
+
+module letter_top(lett) {
+    translate([0, 0, clue_height/2-lh])
+    letter(lett);
+}
+
+module letter_bottom(lett) {
+    translate([0, 0, -clue_height/2-e])
+    mirror([1, 0, 0])
+    letter(lett);
 }
 
 module letter(lett, offset_r=0.2) {
-    translate([0, 0, clue_height/2-lh])
     linear_extrude(height=lh+e)
     offset(r = offset_r)
     text(lett, font="DejaVu Serif:style=Bold", valign="center", halign="center");
